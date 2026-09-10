@@ -46,7 +46,7 @@ def kpi(l, v, s, hi=False):
 
 kpis = kpi("Serviços em cotação", len([c for c in CATS if any(r["categoria"] == c for r in rows)]), f"{len(dem)} demandas mapeadas") + \
        kpi("Fornecedores contatados", f"{len(contatados)}<small>/{len(active)}</small>", "meta: 3 propostas por serviço") + \
-       kpi("Propostas recebidas", len(propostas), f"em {len(best)} serviços") + \
+       kpi("Propostas recebidas", len(propostas), f"em {len({r['categoria'] for r in propostas})} serviços") + \
        kpi("Custo mensal estimado", brl(estimado) if estimado else "—", "menor proposta por serviço" if estimado else "aguardando propostas", True) + \
        kpi("Contratado até agora", brl(tot_contr) if tot_contr else str(len(contratados)), f"{len(contratados)} contrato(s) firmado(s)")
 
