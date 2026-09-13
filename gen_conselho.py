@@ -115,8 +115,8 @@ if os.path.exists(_pp):
             pick = ctr[0] if ctr else (min(props, key=lambda r: float(r[ln["campo"]])) if props else None)
             if pick:
                 valor = float(pick[ln["campo"]]); origem = "contratado" if ctr else "proposta"; quem = pick["empresa"]
-                if ln.get("implantacao_campo") and pick.get(ln["implantacao_campo"]) not in (None, "", 0):
-                    impl = float(pick[ln["implantacao_campo"]])
+                if ln.get("implantacao_campo") and pick.get(ln["implantacao_campo"]) not in (None, ""):
+                    impl = float(pick[ln["implantacao_campo"]])  # 0 explícito = proposta sem taxa de implantação
                 elif ln.get("implantacao_est"):
                     impl = float(ln["implantacao_est"])
         if valor is None and ln.get("igual_linha"):
@@ -133,12 +133,18 @@ if os.path.exists(_pp):
         if not ativo: mensal_eq, sched, impl = 0.0, [0.0] * 12, 0.0
         item = dict(ln, valor=valor, origem=origem, quem=quem, impl=impl, mensal_eq=mensal_eq, sched=sched, ativo=ativo, tipo=tipo, freq=freq)
         linhas.append(item); by_id[ln["id"]] = item
+    for l in linhas:  # grupo: fixo (mensal) · provisao (periódico/legal, provisionado mensalmente) · implantacao (cota única)
+        l["grupo"] = "implantacao" if l["tipo"] == "Implantacao" else (l.get("grupo") or ("provisao" if l["freq"] > 1 else "fixo"))
     desp_mensal = sum(l["mensal_eq"] for l in linhas)
+    fixo_m = sum(l["mensal_eq"] for l in linhas if l["grupo"] == "fixo")
+    prov_m = sum(l["mensal_eq"] for l in linhas if l["grupo"] == "provisao")
     impl_total = sum(l["impl"] for l in linhas if l["ativo"])
+    per_m = [sum(l["sched"][m] for l in linhas if l["grupo"] == "provisao") for m in range(12)]  # desembolsos do grupo B por mês de competência
     prest_m = [sum(l["sched"][m] for l in linhas if l["tipo"] == "Prestador") for m in range(12)]
     conc_m = [sum(l["sched"][m] for l in linhas if l["tipo"] == "Concessionaria") for m in range(12)]
     arrec_nec = desp_mensal / (1 - fr) if fr < 1 else 0
     taxa_nec = arrec_nec / pag if pag else 0
+    taxa_fixo = fixo_m / pag if pag else 0; taxa_prov = prov_m / pag if pag else 0; taxa_fr = taxa_nec - taxa_fixo - taxa_prov
     taxa_nec_inad = taxa_nec / PR["cenarios"]["base"]["em_dia"]
     # ---- fluxo mensal e diário por cenário
     def cenario(cn):
@@ -178,6 +184,7 @@ if os.path.exists(_pp):
         return dict(impl=impl_total * c["fat"], pior=sem_aporte, dia=c["pior_dia"], reserva=reserva, minimo=minimo, recomendado=recomendado, aporte=recomendado / unid if unid else 0)
     CAP = {k: capital(k) for k in CEN}
     # ---- render
+    MESN = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
     def pill_orig(o, quem):
         cls = {"contratado": "st5", "proposta": "st4", "estimativa": "st1"}[o]
         lab = {"contratado": "Contratado", "proposta": "Proposta", "estimativa": "Estimativa"}[o]
@@ -185,11 +192,28 @@ if os.path.exists(_pp):
     def per(freq, tipo):
         if tipo == "Implantacao": return "única"
         return {1: "mensal", 3: "trimestral", 6: "semestral", 12: "anual"}.get(freq, f"a cada {freq} meses")
+    def quando(l):
+        if l["tipo"] == "Implantacao": return "no início"
+        if l["freq"] == 1: return "todo mês"
+        d1 = _add_months(ini, l["primeira"] - 1)
+        return f"1ª em {MESN[d1.month-1]}/{str(d1.year)[2:]}, depois {per(l['freq'], l['tipo'])}"
+    GRP = [("fixo", "A. Custos fixos mensais", "Serviços contínuos, pagos todo mês pelo valor contratado ou cotado."),
+           ("provisao", "B. Provisões mensais para despesas periódicas e legais", "Gastos que ocorrem a cada trimestre, semestre ou ano (ou de forma irregular). Entram na taxa pelo valor mensal equivalente (valor ÷ meses entre ocorrências) e ficam acumulados num fundo de provisões até o desembolso."),
+           ("implantacao", "C. Implantação — cota única, fora da taxa mensal", "Desembolsos de uma vez, no início, cobertos pelo caixa mínimo inicial / cota de implantação, e não pela taxa mensal.")]
     otr = ""
-    for l in linhas:
-        if not l["ativo"]: continue
-        otr += f'<tr><td>{e(l["nome"])}</td><td>{pill_orig(l["origem"], l["quem"])}</td><td class="n c-md">{brl(l["valor"])}<small>{per(l["freq"], l["tipo"])}</small></td><td class="n">{brl(l["mensal_eq"])}</td><td class="n c-md">{brl(l["mensal_eq"]*12)}</td><td class="n c-md">{brl(l["impl"])}</td></tr>'
-    otr += f'<tr class="tot"><td>Total</td><td></td><td class="c-md"></td><td class="n">{brl(desp_mensal)}</td><td class="n c-md">{brl(desp_mensal*12)}</td><td class="n c-md">{brl(impl_total)}</td></tr>'
+    for g, gt, gd in GRP:
+        ls = [l for l in linhas if l["ativo"] and (l["grupo"] == g or (g == "implantacao" and l["impl"] > 0 and l["grupo"] != "implantacao"))]
+        if not ls: continue
+        otr += f'<tr class="grp"><td colspan="6">{gt}<small>{gd}</small></td></tr>'
+        for l in ls:
+            if g == "implantacao":
+                otr += f'<tr><td>{e(l["nome"])}{"" if l["grupo"] == "implantacao" else "<small>parcela de implantação desta linha</small>"}</td><td>{pill_orig(l["origem"], l["quem"])}</td><td class="n c-md">{brl(l["impl"])}<small>única</small></td><td class="c-md">no início</td><td class="n">—</td><td class="n">{brl(l["impl"])}</td></tr>'
+            else:
+                otr += f'<tr><td>{e(l["nome"])}</td><td>{pill_orig(l["origem"], l["quem"])}</td><td class="n c-md">{brl(l["valor"])}<small>{per(l["freq"], l["tipo"])}</small></td><td class="c-md">{quando(l)}</td><td class="n">{brl(l["mensal_eq"])}</td><td class="n">{brl(l["mensal_eq"]*12) if g != "implantacao" else "—"}</td></tr>'
+        if g == "fixo": otr += f'<tr class="tot"><td>Subtotal A — fixos</td><td></td><td class="c-md"></td><td class="c-md"></td><td class="n">{brl(fixo_m)}</td><td class="n">{brl(fixo_m*12)}</td></tr>'
+        elif g == "provisao": otr += f'<tr class="tot"><td>Subtotal B — provisões</td><td></td><td class="c-md"></td><td class="c-md"></td><td class="n">{brl(prov_m)}</td><td class="n">{brl(prov_m*12)}</td></tr>'
+        else: otr += f'<tr class="tot"><td>Subtotal C — implantação</td><td></td><td class="c-md"></td><td class="c-md"></td><td class="n">—</td><td class="n">{brl(impl_total)}</td></tr>'
+    otr += f'<tr class="tot"><td>Despesa mensal (A + B)</td><td></td><td class="c-md"></td><td class="c-md"></td><td class="n">{brl(desp_mensal)}</td><td class="n">{brl(desp_mensal*12)}</td></tr>'
     n_est = len([l for l in linhas if l["ativo"] and l["origem"] == "estimativa"]); n_prop = len([l for l in linhas if l["ativo"] and l["origem"] != "estimativa"])
     # gráfico SVG do caixa livre mensal (base × pessimista)
     W, H, pl, pr_, pt, pb = 640, 220, 56, 12, 14, 30
@@ -198,7 +222,6 @@ if os.path.exists(_pp):
     def X(i): return pl + i * (W - pl - pr_) / 11
     def Y(v): return pt + (vmax - v) * (H - pt - pb) / span
     def path(cn): return "M" + " L".join(f"{X(i):.1f},{Y(x['livre']):.1f}" for i, x in enumerate(CEN[cn]["meses"]))
-    MESN = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
     ticks = "".join(f'<text x="{X(i):.1f}" y="{H-8}" text-anchor="middle" class="ax">{MESN[x["data"].month-1]}/{str(x["data"].year)[2:]}</text>' for i, x in enumerate(CEN["base"]["meses"]))
     grid = ""
     for k in range(5):
@@ -209,14 +232,19 @@ if os.path.exists(_pp):
     cb, cp = CAP["base"], CAP["pessimista"]
     folga = PR["taxa_construtora"] - taxa_nec
     cen_b, cen_p = PR["cenarios"]["base"], PR["cenarios"]["pessimista"]
-    orc_kpis = kpi("Despesa operacional mensal", brl(desp_mensal), f"{brl(desp_mensal*12)} por ano · {n_prop} com proposta, {n_est} estimados") + \
-        kpi("Taxa necessária por unidade", brl(taxa_nec), f"{brl(taxa_nec_inad)} com inadimplência de {100-cen_b['em_dia']*100:.0f}%") + \
+    orc_kpis = kpi("Custos fixos mensais", brl(fixo_m), f"{brl(taxa_fixo)}/unidade · {len([l for l in linhas if l['ativo'] and l['grupo']=='fixo'])} itens") + \
+        kpi("Provisões mensais", brl(prov_m), f"{brl(taxa_prov)}/unidade · {len([l for l in linhas if l['ativo'] and l['grupo']=='provisao'])} itens periódicos/legais") + \
+        kpi("Taxa mensal por unidade", brl(taxa_nec), f"fixos {brl(taxa_fixo)} + provisões {brl(taxa_prov)} + fundo de reserva {brl(taxa_fr)}") + \
         kpi("Estimativa da construtora", brl(PR["taxa_construtora"]), (f"folga de {brl(folga)}/unidade" if folga >= 0 else f"faltam {brl(-folga)}/unidade"), True) + \
-        kpi("Implantação única", brl(impl_total), "desembolsos de uma vez, no início") + \
-        kpi("Caixa mínimo inicial", brl(cp["recomendado"]), f"cenário pessimista · {brl(cb['recomendado'])} no base") + \
-        kpi("Cota de implantação por unidade", brl(cp["aporte"]), f"cota única, pessimista · {brl(cb['aporte'])} no base")
+        kpi("Implantação — cota única", brl(impl_total), f"{brl(impl_total/unid if unid else 0)}/unidade · fora da taxa mensal") + \
+        kpi("Caixa mínimo inicial", brl(cp["recomendado"]), f"cenário pessimista · {brl(cb['recomendado'])} no base")
+    # tabela mensal: fixos, periódicos e fundo de provisões (cenário base)
+    mtr = ""; fundo = 0.0
+    for k, x in enumerate(CEN["base"]["meses"]):
+        fundo += prov_m - (per_m[k - 1] if k >= 1 else 0)
+        mtr += f'<tr><td>{MESN[x["data"].month-1]}/{str(x["data"].year)[2:]}</td><td class="n c-md">{brl(x["ent"])}</td><td class="n">{brl(fixo_m)}</td><td class="n">{brl(per_m[k-1]) if k >= 1 else "—"}</td><td class="n c-md">{brl(prov_m)}</td><td class="n">{brl(fundo).replace("R$ -", "−R$ ")}</td><td class="n">{brl(x["livre"]).replace("R$ -", "−R$ ")}</td></tr>'
     orc_section = f'''<section class="panel" id="orcamento"><h2 style="margin-bottom:6px">Orçamento anual e caixa mínimo inicial</h2>
-<p class="muted" style="font-size:13px;margin:0 0 12px;max-width:80ch">Projeção que se atualiza com as propostas do painel: para cada serviço vale o valor contratado, senão a menor proposta recebida, senão uma estimativa de mercado (marcada como tal). Rateio igual entre {unid} unidades; início dos serviços em {ini.strftime("%d/%m/%Y")}; fundo de reserva de {fr*100:.0f}%; portaria {portaria.lower()}.</p>
+<p class="muted" style="font-size:13px;margin:0 0 12px;max-width:80ch">A taxa mensal é formada por três parcelas: <strong>A — custos fixos</strong> (serviços contínuos, pagos todo mês), <strong>B — provisões</strong> (despesas trimestrais, semestrais ou anuais, muitas exigidas por lei, rateadas em parcelas mensais iguais e acumuladas num fundo até o desembolso) e o <strong>fundo de reserva</strong> ({fr*100:.0f}%). Gastos de implantação, que ocorrem uma única vez, ficam fora da taxa e são cobertos por uma cota única. Para cada serviço vale o valor contratado, senão a menor proposta recebida, senão uma estimativa de mercado (marcada como tal). Rateio igual entre {unid} unidades; início dos serviços em {ini.strftime("%d/%m/%Y")}; portaria {portaria.lower()}.</p>
 <div class="kpis">{orc_kpis}</div>
 <div class="two">
 <div><h2 style="font-size:14px;margin:0 0 6px">Caixa livre ao fim de cada mês</h2>
@@ -232,9 +260,12 @@ if os.path.exists(_pp):
 </tbody></table></div></div>
 </div>
 <h2 style="font-size:14px;margin:16px 0 6px">Orçamento por item</h2>
-<div class="tw"><table><thead><tr><th>Item</th><th>Origem do valor</th><th class="n c-md">Valor</th><th class="n">Por mês</th><th class="n c-md">Ano</th><th class="n c-md">Implantação</th></tr></thead><tbody>{otr}</tbody></table></div>
+<div class="tw"><table><thead><tr><th>Item</th><th>Origem do valor</th><th class="n c-md">Valor</th><th class="c-md">Quando ocorre</th><th class="n">Na taxa mensal</th><th class="n">Ano</th></tr></thead><tbody>{otr}</tbody></table></div>
+<h2 style="font-size:14px;margin:16px 0 6px">Mês a mês — fixos, periódicos e fundo de provisões (cenário base)</h2>
+<p class="muted" style="font-size:12px;margin:0 0 8px;max-width:90ch">Os fixos saem todo mês; os periódicos saem só quando vencem e são pagos com o fundo de provisões, alimentado por {brl(prov_m)} por mês. Fundo negativo nos primeiros meses indica despesa periódica que vence antes de a provisão estar formada — é o que o caixa mínimo inicial cobre. Fixos e periódicos por mês de competência (o pagamento cai no dia {dpag} do mês seguinte); caixa livre pelo calendário real, já sem o fundo de reserva.</p>
+<div class="tw"><table><thead><tr><th>Mês</th><th class="n c-md">Entradas</th><th class="n">Fixos (A)</th><th class="n">Periódicos pagos (B)</th><th class="n c-md">Provisão do mês</th><th class="n">Fundo de provisões</th><th class="n">Caixa livre</th></tr></thead><tbody>{mtr}</tbody></table></div>
 <details style="margin-top:12px"><summary class="muted" style="cursor:pointer;font-size:13px">Premissas e método</summary>
-<p class="muted" style="font-size:12px;max-width:90ch">Boletos vencem no dia {venc}; prestadores são pagos no dia {dpag} do mês seguinte à competência e concessionárias no dia {dcon}. Atrasos de 30 e 60 dias são recebidos nos vencimentos seguintes. O fundo de reserva ({fr*100:.0f}% do recebido) fica segregado e não conta como caixa livre. Taxa necessária = despesa mensal ÷ (1 − fundo de reserva) ÷ unidades pagantes. Caixa mínimo = o que falta para o caixa livre não ficar negativo no pior dia dos 90 primeiros dias (já incluindo a implantação) + reserva de segurança. Estimativas de mercado (Cascavel, set/2026) não são propostas e são substituídas automaticamente quando uma proposta é lançada no painel. Itens sem categoria no painel (energia, tarifas, material) permanecem estimados até a primeira fatura.</p></details>
+<p class="muted" style="font-size:12px;max-width:90ch">Boletos vencem no dia {venc}; prestadores são pagos no dia {dpag} do mês seguinte à competência e concessionárias no dia {dcon}. Atrasos de 30 e 60 dias são recebidos nos vencimentos seguintes. O fundo de reserva ({fr*100:.0f}% do recebido) fica segregado e não conta como caixa livre. Taxa mensal = (custos fixos + provisões mensais) ÷ (1 − fundo de reserva) ÷ unidades pagantes; a provisão mensal de cada item periódico = valor da ocorrência ÷ meses entre ocorrências, de modo que nenhuma despesa anual ou semestral entra na taxa pelo valor cheio. Fixos e periódicos são pagos nas datas em que realmente ocorrem (o fluxo de caixa usa o calendário real, não a média). Caixa mínimo = o que falta para o caixa livre não ficar negativo no pior dia dos 90 primeiros dias (já incluindo a implantação) + reserva de segurança. Estimativas de mercado (Cascavel, set/2026) não são propostas e são substituídas automaticamente quando uma proposta é lançada no painel. Itens sem categoria no painel (energia, tarifas, material) permanecem estimados até a primeira fatura.</p></details>
 </section>'''
 
 page = f'''<title>Cotações LIV — Conselho</title>
@@ -257,7 +288,7 @@ h1{{font:700 26px/1.15 "Sora",sans-serif;margin:0;letter-spacing:-.01em}} h2{{fo
 .two{{display:grid;grid-template-columns:1.9fr 1fr;gap:16px}}.two td,.two th{{white-space:nowrap;padding-left:7px;padding-right:7px}}.two td:first-child{{white-space:normal}}@media(max-width:820px){{.two{{grid-template-columns:1fr}}}}
 .tw{{overflow-x:auto}}table{{border-collapse:collapse;width:100%}}th{{text-align:left;font:500 11px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}}td{{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}}tr:last-child td{{border-bottom:0}}
 td small{{display:block;color:var(--ink-3);font-size:12px}}.n{{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}}th.n{{text-align:right}}
-tr.tot td{{font-weight:600;background:var(--surface-2)}}tr.done td{{background:color-mix(in srgb,var(--good-soft) 55%,transparent)}}tr.out td{{opacity:.5}}
+tr.tot td{{font-weight:600;background:var(--surface-2)}}tr.grp td{{background:var(--surface-2);font-weight:600;font-size:12.5px;padding-top:10px}}tr.grp td small{{display:block;font-weight:400;color:var(--ink-3);font-size:11.5px;max-width:90ch}}tr.done td{{background:color-mix(in srgb,var(--good-soft) 55%,transparent)}}tr.out td{{opacity:.5}}
 .muted{{color:var(--ink-3)}}td.n small{{display:block;font:400 10.5px "IBM Plex Mono",monospace;color:var(--ink-3)}}#orcamento .two{{grid-template-columns:1.2fr 1fr;align-items:start}}@media(max-width:820px){{#orcamento .two{{grid-template-columns:1fr}}}}#orcamento .pill+small{{display:block;color:var(--ink-3);font-size:11px;margin-top:2px}}
 .prog i{{display:inline-block;width:14px;height:6px;border-radius:2px;background:var(--surface-2);margin-right:2px;vertical-align:middle}}.prog i.on{{background:var(--accent)}}
 .pill{{display:inline-block;padding:2px 8px;border-radius:999px;font:500 11px "IBM Plex Mono",monospace;white-space:nowrap}}.st0{{background:var(--muted-soft);color:var(--ink-2)}}.st1{{background:var(--warn-soft);color:var(--warn)}}.st2,.st3,.st4{{background:var(--accent-soft);color:var(--accent)}}.st5{{background:var(--good-soft);color:var(--good)}}.st6{{background:var(--muted-soft);color:var(--ink-3)}}
