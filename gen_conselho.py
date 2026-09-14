@@ -121,6 +121,7 @@ if os.path.exists(_pp):
                     impl = float(ln["implantacao_est"])
         if valor is None and ln.get("igual_linha"):
             src = by_id.get(ln["igual_linha"]); valor = src["valor"] if src else 0.0; origem = src["origem"] if src else "estimativa"; quem = src["quem"] if src else ""
+            if ln.get("quem_nao_contem") and any(k.lower() in _low(quem) for k in ln["quem_nao_contem"]): valor = 0.0
         if valor is None:
             valor = (float(ln.get("est_min", 0)) + float(ln.get("est_max", 0))) / 2
             if ln.get("por_elevador"): valor *= elev

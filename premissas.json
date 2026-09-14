@@ -168,10 +168,13 @@
       "nome": "Administração — 13º honorário (dezembro)",
       "categoria": null,
       "igual_linha": "admin",
+      "quem_nao_contem": [
+        "Eccellenza"
+      ],
       "tipo": "Prestador",
       "freq": 12,
       "primeira": 3,
-      "fonte": "Proposta Roma: 13º honorário em dezembro. 1ª ocorrência no 3º mês (dez/26)."
+      "fonte": "13º honorário cobrado por algumas administradoras (ex.: Roma, Rigoni) em dezembro; zerado automaticamente se a administradora com a proposta mais barata isentar o 13º (caso da Eccellenza)."
     },
     {
       "id": "jardim",
