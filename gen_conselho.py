@@ -15,10 +15,11 @@ for _r in rows:
 dem = json.load(open(os.path.join(HERE, "demandas.json"), encoding="utf-8"))  # aba Demandas da planilha, exportada
 
 CATS = ["Administração/contabilidade", "Portaria / Zeladoria / Limpeza", "Portaria remota", "Controle de pragas / Caixa d'água",
-        "Análise de água (poço)", "Piscineiro", "Jardinagem", "Extintores / incêndio", "Elevadores", "Seguro", "Gás (GLP)", "Manutenção predial", "Outros"]
+        "Análise de água (poço)", "Piscineiro", "Jardinagem", "Extintores / incêndio", "Elevadores", "Seguro", "Gás (GLP)", "Manutenção predial",
+        "Box de entregas", "Outros"]
 MAP = {1: "Portaria / Zeladoria / Limpeza", 2: "Portaria / Zeladoria / Limpeza", 3: "Análise de água (poço)", 4: "Controle de pragas / Caixa d'água",
        5: "Controle de pragas / Caixa d'água", 6: "Piscineiro", 7: "Portaria remota", 8: "Administração/contabilidade", 9: "Jardinagem",
-       10: "Elevadores", 11: "Extintores / incêndio", 12: "Manutenção predial", 13: "Seguro", 14: "Outros"}
+       10: "Elevadores", 11: "Extintores / incêndio", 12: "Manutenção predial", 13: "Seguro", 14: "Outros", 15: "Box de entregas"}
 STATUS = ["A contatar", "Contatado", "Visita agendada", "Visita realizada", "Orçamento recebido", "Contratado", "Descartado"]
 PUB = {"A contatar": "Contato pendente", "Contatado": "Em contato", "Visita agendada": "Visita agendada", "Visita realizada": "Visita realizada",
        "Orçamento recebido": "Proposta recebida", "Contratado": "Contratado", "Descartado": "Descartado"}

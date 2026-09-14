@@ -213,8 +213,20 @@
       "fonte": "Estimativa anual."
     },
     {
+      "id": "incendio_mensal",
+      "nome": "Extintores — inspeção mensal NR23",
+      "categoria": "Extintores / incêndio",
+      "campo": "valorMensal",
+      "tipo": "Prestador",
+      "est_min": 400,
+      "est_max": 700,
+      "freq": 1,
+      "primeira": 1,
+      "fonte": "Proposta Extinvel nº 15648/2026: R$ 500,00/mês pela inspeção mensal (parte recorrente do contrato)."
+    },
+    {
       "id": "incendio",
-      "nome": "Extintores, hidrantes e iluminação de emergência — anual",
+      "nome": "Extintores, hidrantes e iluminação de emergência — recargas e teste, anual",
       "categoria": "Extintores / incêndio",
       "campo": "valorAvulso",
       "tipo": "Prestador",
@@ -222,7 +234,7 @@
       "est_max": 3000,
       "freq": 12,
       "primeira": 2,
-      "fonte": "Estimativa anual; 1ª no 2º mês para regularizar o certificado."
+      "fonte": "Proposta Extinvel nº 15648/2026: R$ 5.460,00/ano em recargas de extintores e teste hidrostático de mangueiras (parte anual do contrato, separada da inspeção mensal)."
     },
     {
       "id": "predial",
@@ -259,6 +271,18 @@
       "freq": 1,
       "primeira": 1,
       "fonte": "Estimativa: prêmio anual R$ 6–12 mil parcelado."
+    },
+    {
+      "id": "box_entregas",
+      "nome": "Box de entregas inteligente (armário de encomendas)",
+      "categoria": "Box de entregas",
+      "campo": "valorMensal",
+      "tipo": "Prestador",
+      "est_min": 0,
+      "est_max": 0,
+      "freq": 1,
+      "primeira": 1,
+      "fonte": "Proposta V Express recebida em 14/09/2026: R$ 650,00/mês, contrato de 24 meses, com 30 dias de teste grátis. Serviço opcional — inclui na taxa apenas se o conselho decidir contratar; sem cotação, entra como R$ 0,00 (est_min/est_max)."
     },
     {
       "id": "residuos",
