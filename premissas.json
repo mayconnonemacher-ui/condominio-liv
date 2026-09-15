@@ -10,10 +10,26 @@
   "dia_pagto_prestadores": 15,
   "dia_pagto_concessionarias": 20,
   "saldo_inicial": 0,
+  "fundo_instalacao": {
+    "_fonte": "Ata da AGE de instalação de 02/09/2026, item 6: fundo inicial de instalação de R$ 4.000 por unidade (capital de giro e primeiras despesas), rateio igual entre as 32 unidades, incorporadora paga pelas unidades não alienadas; 2 parcelas de R$ 2.000 vencendo 20/09 e 20/10/2026. Se a conta bancária atrasar, o síndico pode levar a 1ª parcela para o início de outubro ou cobrar tudo até 20/10 (edite as datas abaixo). O modelo aplica a cada parcela o mesmo perfil de recebimento dos boletos (em dia / +30 / +60) de cada cenário.",
+    "valor_por_unidade": 4000,
+    "parcelas": [
+      {
+        "vencimento": "2026-09-20",
+        "valor_por_unidade": 2000
+      },
+      {
+        "vencimento": "2026-10-20",
+        "valor_por_unidade": 2000
+      }
+    ]
+  },
   "aporte_por_unidade": 0,
+  "_aporte_obs": "Campo legado (aporte único no dia 1, além do fundo de instalação). Mantido em 0.",
   "modelo_portaria": "Remota",
   "elevadores": 2,
   "reserva_seguranca_meses": 1,
+  "_fundo_reserva_obs": "Fundo de reserva de 10% sobre a cota ordinária aprovado na AGE de 02/09/2026 (item 7), cobrado a partir dos rateios ordinários. Fundo permanente de manutenção/obras (10%) foi REJEITADO na mesma assembleia (item 8) — não incluir.",
   "cenarios": {
     "base": {
       "em_dia": 0.88,
@@ -30,7 +46,7 @@
       "fator_despesa": 1.1
     }
   },
-  "_linhas_regras": "Valor usado por linha: (1) proposta com status Contratado na categoria → (2) menor proposta recebida na categoria (campo indicado) → (3) média da estimativa. 'empresa_contem' / 'empresa_nao_contem' filtram os fornecedores da categoria pelo nome. tipo: Prestador (pago no mês seguinte, dia dos prestadores), Concessionaria (dia 20 do mês seguinte) ou Implantacao (dia 1). freq = a cada quantos meses; primeira = mês nº da 1ª ocorrência (1 = mês de início). grupo (opcional): 'fixo' ou 'provisao' — por padrão freq 1 = fixo e freq > 1 = provisão; use 'provisao' para reservas mensais de gastos irregulares (manutenção, imprevistos).",
+  "_linhas_regras": "Valor usado por linha: (1) proposta com status Contratado na categoria → (2) menor proposta recebida na categoria (campo indicado) → (3) média da estimativa. 'empresa_contem' / 'empresa_nao_contem' filtram os fornecedores da categoria pelo nome. tipo: Prestador (pago no mês seguinte, dia dos prestadores), Concessionaria (dia 20 do mês seguinte) ou Implantacao (dia 1). freq = a cada quantos meses; primeira = mês nº da 1ª ocorrência (1 = mês de início). grupo (opcional): 'fixo' ou 'provisao' — por padrão freq 1 = fixo e freq > 1 = provisão; use 'provisao' para reservas mensais de gastos irregulares (manutenção, imprevistos). 'fixado_em' marca um valor fixado em assembleia (pill 'Deliberado'): usa est_min/est_max sem procurar propostas.",
   "linhas": [
     {
       "id": "zeladoria_limpeza",
@@ -161,7 +177,10 @@
       "est_max": 1200,
       "freq": 1,
       "primeira": 1,
-      "fonte": "Proposta Roma Contabilidade: R$ 650/mês."
+      "fonte": "Definição do síndico (15/09/2026): Rigoni Administradora de Condomínios, R$ 1.200/mês após desconto (proposta original R$ 1.621), com 13º honorário em dezembro e reajuste em janeiro pelo salário-mínimo; a ratificar na AGE de 24/09. 'empresa_contem' trava a linha na Rigoni — remova para voltar a usar a menor proposta da categoria.",
+      "empresa_contem": [
+        "Rigoni"
+      ]
     },
     {
       "id": "admin_13",
@@ -174,7 +193,19 @@
       "tipo": "Prestador",
       "freq": 12,
       "primeira": 3,
-      "fonte": "13º honorário cobrado por algumas administradoras (ex.: Roma, Rigoni) em dezembro; zerado automaticamente se a administradora com a proposta mais barata isentar o 13º (caso da Eccellenza)."
+      "fonte": "13º honorário em dezembro, conforme a proposta da Rigoni (copia a linha 'admin'); zerado automaticamente se a administradora escolhida isentar o 13º (caso da Eccellenza)."
+    },
+    {
+      "id": "sindico",
+      "nome": "Remuneração do síndico — 3 salários-mínimos (AGE 02/09/2026)",
+      "categoria": null,
+      "tipo": "Prestador",
+      "est_min": 4863,
+      "est_max": 4863,
+      "freq": 1,
+      "primeira": 1,
+      "fonte": "Ata da AGE de 02/09/2026, item 3: 3 salários-mínimos nacionais (R$ 1.621 em 2026 → R$ 4.863/mês), com início em 10/10/2026 e atualização automática pelo salário-mínimo. Valor fixado em assembleia, não é estimativa de mercado.",
+      "fixado_em": "Ata AGE 02/09/2026"
     },
     {
       "id": "jardim",
