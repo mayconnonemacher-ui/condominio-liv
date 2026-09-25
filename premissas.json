@@ -1,10 +1,10 @@
 {
-  "_comentario": "Premissas do orçamento, fluxo de caixa e capital de giro exibidos na página do conselho. Edite aqui e faça upload no GitHub; a rotina de publicação recalcula tudo. Valores em R$; percentuais em fração (0.10 = 10%). FORA DO ORÇAMENTO por decisão do síndico (18/09/2026): gás/GLP — fornecimento e cobrança individual por unidade, direto pela distribuidora, sem cotação pelo condomínio; manutenção de elevadores (mensal e RIA/ART) — fica com a fabricante do equipamento para não perder a garantia; manutenção elétrica/hidráulica/predial e laudo do SPDA — sem previsão de levantamento de demanda/orçamento. As linhas 'elevadores', 'elev_ria', 'predial' e 'spda' foram removidas; reincluir aqui se a decisão mudar.",
+  "_comentario": "Premissas do orçamento, fluxo de caixa e capital de giro exibidos na página do conselho. Edite aqui e faça upload no GitHub; a rotina de publicação recalcula tudo. Valores em R$; percentuais em fração (0.10 = 10%). FORA DO ORÇAMENTO por decisão do síndico (18/09/2026): gás/GLP — fornecimento e cobrança individual por unidade, direto pela distribuidora, sem cotação pelo condomínio; manutenção de elevadores (mensal e RIA/ART) — fica com a fabricante do equipamento para não perder a garantia; manutenção elétrica/hidráulica/predial e laudo do SPDA — sem previsão de levantamento de demanda/orçamento. As linhas 'elevadores', 'elev_ria', 'predial' e 'spda' foram removidas; reincluir aqui se a decisão mudar. 25/09/2026 (manhã da AGE): série mensal de caixa, necessidade de caixa mínimo e folga do fundo de instalação RECALCULADAS com gen_conselho.py sobre este arquivo e o banco do painel (55 fornecedores), incluindo a decisão do Conselho de 24/09 (Atlanta portaria remota R$ 5.500 e zeladoria R$ 21.300) e a 2ª proposta de piscina (Edson, R$ 800).",
   "unidades": 32,
   "unidades_isentas": 0,
   "taxa_construtora": 1200,
-  "taxa_adotada": 1543,
-  "_taxa_adotada_obs": "Taxa necessária calculada a partir do orçamento das propostas recebidas (item 5 da pauta da AGE de 25/09/2026) — substitui a referência de R$ 1.200 da construtora para fins de projeção de fluxo de caixa. Histórico: R$ 1.654 (5ª atualização, 16/09) → R$ 1.644 (6ª, 18/09, 1ª proposta de piscina a R$ 850) → R$ 1.543 (7ª, 18/09, retirada de elevadores, RIA, manutenção predial e SPDA do orçamento). Ajuste aqui se a assembleia fixar valor diferente.",
+  "taxa_adotada": 1652,
+  "_taxa_adotada_obs": "Taxa necessária calculada a partir do orçamento das propostas recebidas (item 5 da pauta da AGE de 25/09/2026) — substitui a referência de R$ 1.200 da construtora para fins de projeção de fluxo de caixa. Histórico: R$ 1.654 (5ª atualização, 16/09) → R$ 1.644 (6ª, 18/09, 1ª proposta de piscina a R$ 850) → R$ 1.543 (7ª, 18/09, retirada de elevadores, RIA, manutenção predial e SPDA do orçamento; mantida na 8ª, 23/09) → R$ 1.670 (24/09, manhã: Conselho recomendou contratar Atlanta para portaria remota, R$ 5.980, e zeladoria com 3 postos, R$ 21.300) → R$ 1.654 (24/09, tarde: Atlanta ajustou a portaria remota para R$ 5.500/mês) → R$ 1.652 (25/09, manhã: 2ª proposta de piscina, Tratamento Piscinas Edson, R$ 800/mês, R$ 50 abaixo do Anderson). Ajuste aqui se a assembleia fixar valor diferente.",
   "fundo_reserva": 0.1,
   "inicio_servicos": "2026-10-01",
   "dia_vencimento_boleto": 10,
@@ -12,11 +12,11 @@
   "dia_pagto_concessionarias": 20,
   "saldo_inicial": 0,
   "fundo_instalacao": {
-    "_fonte": "Ata da AGE de instalação de 02/09/2026, item 6: fundo inicial de instalação de R$ 4.000 por unidade (capital de giro e primeiras despesas), rateio igual entre as 32 unidades, incorporadora paga pelas unidades não alienadas; 2 parcelas de R$ 2.000 vencendo 20/09 e 20/10/2026. Se a conta bancária atrasar, o síndico pode levar a 1ª parcela para o início de outubro ou cobrar tudo até 20/10 (edite as datas abaixo). O modelo aplica a cada parcela o mesmo perfil de recebimento dos boletos (em dia / +30 / +60) de cada cenário.",
+    "_fonte": "Ata da AGE de instalação de 02/09/2026, item 6: fundo inicial de instalação de R$ 4.000 por unidade (capital de giro e primeiras despesas), rateio igual entre as 32 unidades, incorporadora paga pelas unidades não alienadas; 2 parcelas de R$ 2.000, com vencimento original em 20/09 e 20/10/2026. Ajuste do síndico (24/09/2026), dentro da faculdade prevista na própria ata ('o síndico poderá transferir o vencimento da primeira parcela para o início de outubro'): 1ª parcela adiada para 30/09/2026 (fim de setembro); 2ª parcela mantida em 20/10/2026. O modelo aplica a cada parcela o mesmo perfil de recebimento dos boletos (em dia / +30 / +60) de cada cenário.",
     "valor_por_unidade": 4000,
     "parcelas": [
       {
-        "vencimento": "2026-09-20",
+        "vencimento": "2026-09-30",
         "valor_por_unidade": 2000
       },
       {
@@ -47,7 +47,7 @@
       "fator_despesa": 1.1
     }
   },
-  "_linhas_regras": "Valor usado por linha: (1) proposta com status Contratado na categoria → (2) menor proposta recebida na categoria (campo indicado) → (3) média da estimativa. 'empresa_contem' / 'empresa_nao_contem' filtram os fornecedores da categoria pelo nome. tipo: Prestador (pago no mês seguinte, dia dos prestadores), Concessionaria (dia 20 do mês seguinte) ou Implantacao (dia 1). freq = a cada quantos meses; primeira = mês nº da 1ª ocorrência (1 = mês de início). grupo (opcional): 'fixo' ou 'provisao' — por padrão freq 1 = fixo e freq > 1 = provisão; use 'provisao' para reservas mensais de gastos irregulares (manutenção, imprevistos). 'fixado_em' marca um valor fixado em assembleia (pill 'Deliberado'): usa est_min/est_max sem procurar propostas.",
+  "_linhas_regras": "Valor usado por linha: (1) proposta com status Contratado na categoria → (2) menor proposta recebida na categoria (campo indicado) → (3) média da estimativa. 'empresa_contem' / 'empresa_nao_contem' filtram os fornecedores da categoria pelo nome. tipo: Prestador (pago no mês seguinte, dia dos prestadores), Concessionaria (dia 20 do mês seguinte) ou Implantacao (dia 1). freq = a cada quantos meses; primeira = mês nº da 1ª ocorrência (1 = mês de início). grupo (opcional): 'fixo' ou 'provisao' — por padrão freq 1 = fixo e freq > 1 = provisão; use 'provisao' para reservas mensais de gastos irregulares (manutenção, imprevistos). 'fixado_em' marca um valor fixado em assembleia (pill 'Deliberado'): usa est_min/est_max sem procurar propostas. CORREÇÃO 25/09/2026: o gen_conselho.py passou a respeitar 'fixado_em' de fato (antes procurava propostas primeiro e ignorava o valor fixado).",
   "linhas": [
     {
       "id": "zeladoria_limpeza",
@@ -55,17 +55,17 @@
       "categoria": "Portaria / Zeladoria / Limpeza",
       "campo": "valorMensal",
       "empresa_nao_contem": [
-        "Atlanta",
         "Proteção",
         "Monitoramento",
         "Alarmes"
       ],
       "tipo": "Prestador",
-      "est_min": 10500,
-      "est_max": 13500,
+      "est_min": 21300,
+      "est_max": 21300,
       "freq": 1,
       "primeira": 1,
-      "fonte": "Estimativa original: 2 postos 44h terceirizados em Cascavel, com encargos. Propostas recebidas (todas comparadas em 3 postos): S.O.P R$ 18.600 · Grupo Proteção R$ 18.900 · Anelo R$ 19.860 (cotou 2 postos a R$ 6.620) · OnlinePort R$ 20.400 (cotou 2 postos a R$ 6.800, nº 32) · Atlanta R$ 21.300 (1 posto × 3). Em andamento: Wersatil, Apolo."
+      "fixado_em": "Grupo Atlanta — recomendação do Conselho Fiscal e Consultivo (24/09/2026)",
+      "fonte": "Decisão do Conselho Fiscal e Consultivo (24/09/2026): contratar o Grupo Atlanta, com 3 postos de zeladoria — R$ 7.100/posto × 3 = R$ 21.300/mês (mesmo critério de equivalência a 3 postos já usado nas demais propostas da categoria). Substitui a indicação anterior pela menor proposta (S.O.P Digital Service, R$ 18.600) — diferença de R$ 2.700/mês. Propostas recebidas para comparação: S.O.P R$ 18.600 · Grupo Proteção R$ 18.900 · Anelo R$ 19.860 (2 postos cotados) · OnlinePort R$ 20.400 (2 postos cotados) · Atlanta R$ 21.300 (1 posto cotado, extrapolado para 3). Em andamento: Wersatil, Apolo — não alteram a decisão do Conselho."
     },
     {
       "id": "limpeza_pesada",
@@ -90,7 +90,7 @@
       "primeira": 1,
       "implantacao_campo": "valorAvulso",
       "implantacao_est": 800,
-      "fonte": "Duas propostas: Limpvel R$ 450/mês + R$ 810 (fotômetro + reagente) e Braságua R$ 600/mês + R$ 1.200 de implantação (orçamento 60/2026, 15/09/2026). Vale a menor (Limpvel)."
+      "fonte": "Duas propostas: Limpvel R$ 450/mês + R$ 810 (fotômetro + reagente) e Braságua R$ 600/mês + R$ 1.200 de implantação (orçamento 60/2026, 15/09/2026). Vale a menor (Limpvel) — confirmado pelo Conselho Fiscal e Consultivo em 24/09/2026 junto com as demais recomendações de contratação."
     },
     {
       "id": "pragas",
@@ -120,7 +120,7 @@
       "est_max": 2400,
       "freq": 6,
       "primeira": 1,
-      "fonte": "Proposta Limpvel: R$ 1.900 por execução (2 cisternas + 4 reservatórios elevados)."
+      "fonte": "Proposta Limpvel: R$ 1.900 por execução (2 cisternas + 4 reservatórios elevados) — confirmada pelo Conselho Fiscal e Consultivo em 24/09/2026."
     },
     {
       "id": "piscina",
@@ -132,7 +132,7 @@
       "est_max": 1400,
       "freq": 1,
       "primeira": 1,
-      "fonte": "1ª proposta recebida (lançada em 18/09/2026): Tratamento Piscinas Anderson (Anderson Portes), orçamento nº 012-2026 de 16/09/2026 — R$ 850,00/mês, 2 visitas por semana (8/mês), tratamento físico (aspiração, escovação, bordas, peneira) e químico (pH, alcalinidade, dureza cálcica, ácido cianúrico, cloro), validade até 01/10/2026; a confirmar se os produtos químicos estão inclusos. Substitui a estimativa de R$ 900–1.400 (2–3 visitas/semana com produtos). Meta de 3 propostas ainda não atingida (Bella's Piscinas contatada; Douglas Piscina e Loja das Piscinas a contatar)."
+      "fonte": "Duas propostas de escopo idêntico (2 visitas/semana = 8/mês; tratamento físico: aspiração, escovação, bordas, peneira; químico: pH, alcalinidade, dureza cálcica, ácido cianúrico, cloro): (1) Tratamento Piscinas Anderson (Anderson Portes), orç. nº 012-2026 de 16/09/2026, R$ 850,00/mês, validade 01/10; (2) Tratamento Piscinas Edson (Edson Souza dos Santos), orç. nº 024-2026 de 24/09/2026, R$ 800,00/mês, validade 24/10 — lançada em 25/09, passa a ser a menor e vale para a linha. Ambas abaixo da estimativa de R$ 900–1.400. A confirmar nas duas: produtos químicos inclusos ou à parte; prazo de contrato; chamados extras. Meta de 3 propostas ainda não atingida (Bella's Piscinas contatada; Douglas Piscina e Loja das Piscinas a contatar)."
     },
     {
       "id": "portaria_remota",
@@ -141,13 +141,14 @@
       "campo": "valorMensal",
       "tipo": "Prestador",
       "portaria": "Remota",
-      "est_min": 2500,
-      "est_max": 4500,
+      "est_min": 5500,
+      "est_max": 5500,
       "freq": 1,
       "primeira": 1,
       "implantacao_campo": "valorAvulso",
-      "implantacao_est": 15000,
-      "fonte": "Propostas: OnlinePort R$ 5.000/mês (orçamento nº 27, 15/09/2026; equipamentos em comodato confirmados verbalmente em 16/09 — valorAvulso 0; prazo, mapa de equipamentos e revalidação por escrito pendentes) · Fast Portaria R$ 5.000/mês (proposta revisada de 21/09/2026: 60 meses, comodato, sem instalação, mapa de equipamentos entregue, validade 45 dias; opcionais: facial nos elevadores R$ 450/mês e monitoramento perimetral R$ 300/mês — fora da linha) · Atlanta R$ 5.980 (relatório de equipamentos entregue em 18/09). Empate de preço entre OnlinePort e Fast: a linha usa R$ 5.000 e a escolha do fornecedor não altera o orçamento. Implantação estimada em R$ 15.000 só se aplica quando a proposta escolhida não traz valorAvulso."
+      "implantacao_est": 0,
+      "fixado_em": "Grupo Atlanta — recomendação do Conselho (24/09/2026), preço ajustado para R$ 5.500",
+      "fonte": "SEM implantação (equipamentos em comodato). Decisão do Conselho Fiscal e Consultivo (24/09/2026): contratar o Grupo Atlanta (orçamento nº 013405448437099695), equipamentos em comodato, sem taxa de instalação. Proposta original R$ 5.980/mês; AJUSTADA no mesmo dia (24/09/2026, negociação posterior) para R$ 5.500/mês — confirmar por escrito a formalização desse novo valor antes de assinar. Escopo mais amplo que as demais propostas (módulo Cortex, gerador com autonomia de até 12h, motorização das portas social e deslizante, 4 fechaduras eletroímã, DVR 14 dias e até 12 câmeras). Mesmo após o ajuste, ainda R$ 500/mês acima do empate de preço Fast/OnlinePort (R$ 5.000). Propostas recebidas para comparação: OnlinePort R$ 5.000 (revalidação e mapa pendentes) · Fast Portaria R$ 5.000 (proposta revisada de 21/09, mapa e vistoria por escrito; opcionais fora do orçamento: facial nos elevadores R$ 450/mês e monitoramento perimetral R$ 300/mês) · Atlanta R$ 5.500 (proposta ajustada, mapa original entregue em 18/09)."
     },
     {
       "id": "portaria_presencial",
@@ -178,7 +179,7 @@
       "est_max": 1200,
       "freq": 1,
       "primeira": 1,
-      "fonte": "Definição do Conselho Fiscal e Consultivo (16/09/2026): Rigoni Administradora de Condomínios. Proposta ATUALIZADA de 16/09/2026: R$ 850/mês (reajuste todo janeiro pelo salário-mínimo) + honorário de fechamento anual de R$ 850 em dezembro; bônus: abertura do CNPJ e auxílio na abertura da conta bancária sem custo. Histórico: R$ 1.621 (11/09) → R$ 1.200 (15/09) → R$ 850 (16/09). A ratificar na AGE de 25/09. 6ª proposta da categoria em 17/09/2026: Condomínios VIP (Edson Cadini) R$ 1.000/mês + 1 mensalidade em dezembro, reajuste IPCA, app Condominizar e cobrança extrajudicial (Cadini Advogados) sem custo para o condomínio — chegou após a definição do Conselho e não altera a linha. 'empresa_contem' trava a linha na Rigoni — remova para voltar a usar a menor proposta da categoria.",
+      "fonte": "Definição do Conselho Fiscal e Consultivo (16/09/2026, reconfirmada em 24/09/2026 junto com as demais recomendações de contratação): Rigoni Administradora de Condomínios. Proposta ATUALIZADA de 16/09/2026: R$ 850/mês (reajuste todo janeiro pelo salário-mínimo) + honorário de fechamento anual de R$ 850 em dezembro; bônus: abertura do CNPJ e auxílio na abertura da conta bancária sem custo. Histórico: R$ 1.621 (11/09) → R$ 1.200 (15/09) → R$ 850 (16/09). A ratificar na AGE de 25/09. 6ª proposta da categoria em 17/09/2026: Condomínios VIP (Edson Cadini) R$ 1.000/mês + 1 mensalidade em dezembro, reajuste IPCA, app Condominizar e cobrança extrajudicial (Cadini Advogados) sem custo para o condomínio — chegou após a definição do Conselho e não altera a linha. 'empresa_contem' trava a linha na Rigoni — remova para voltar a usar a menor proposta da categoria.",
       "empresa_contem": [
         "Rigoni"
       ]
@@ -266,7 +267,7 @@
       "est_max": 0,
       "freq": 1,
       "primeira": 1,
-      "fonte": "Duas propostas em mãos, serviço ainda opcional (só entra na taxa se a assembleia aprovar): (1) V Express, recebida 14/09/2026, R$ 650,00/mês, contrato de 24 meses, 30 dias de teste grátis; (2) Grupo Atlanta ('Armários Inteligentes'), recebida 16/09/2026, R$ 650,00/mês (mensalidade do sistema de gestão) por 1 módulo central de 10 portas (cobre até ~70 unidades, expansível por módulos adicionais), contrato de locação de 36 meses. Mesmo valor mensal; diferença está no prazo de contrato e na capacidade/expansão do equipamento. Sem decisão, entra como R$ 0,00 (est_min/est_max)."
+      "fonte": "Duas propostas em mãos, serviço ainda opcional (só entra na taxa se a assembleia aprovar): (1) V Express, recebida 14/09/2026, R$ 650,00/mês, contrato de 24 meses, 30 dias de teste grátis; (2) Grupo Atlanta ('Armários Inteligentes'), recebida 16/09/2026, R$ 650,00/mês (mensalidade do sistema de gestão) por 1 módulo central de 10 portas (cobre até ~70 unidades, expansível por módulos adicionais), contrato de locação de 36 meses. Mesmo valor mensal; diferença está no prazo de contrato e na capacidade/expansão do equipamento. Não fez parte da recomendação de contratação do Conselho em 24/09/2026 (fica 'a definir'); segue entrando no orçamento pelo empate de preço entre as duas propostas até a assembleia decidir."
     },
     {
       "id": "residuos",

@@ -108,7 +108,7 @@ if os.path.exists(_pp):
         ativo = (ln.get("portaria") in (None, portaria))
         origem, valor, impl, quem = "estimativa", None, 0.0, ""
         cands = []
-        if ln.get("categoria") and ln.get("campo"):
+        if ln.get("categoria") and ln.get("campo") and not ln.get("fixado_em"):  # valor fixado em assembleia/conselho não procura propostas
             for r in active:
                 if r["categoria"] != ln["categoria"]: continue
                 nm = _low(r["empresa"])
@@ -205,6 +205,12 @@ if os.path.exists(_pp):
                     aporte=recomendado / unid if unid else 0, fundo=fi_total, fundo_90=c["fi_90"], folga=fi_total - recomendado,
                     pior_com=c["pior"], dia_com=c["pior_dia"])
     CAP = {k: capital(k) for k in CEN}
+    if os.environ.get("LIV_DUMP"):
+        json.dump(dict(taxa_nec=taxa_nec, desp_mensal=desp_mensal, fixo_m=fixo_m, prov_m=prov_m, impl_total=impl_total, taxa_fixo=taxa_fixo, taxa_prov=taxa_prov, taxa_fr=taxa_fr,
+                       CAP={k: {kk: (vv.isoformat() if hasattr(vv, "isoformat") else vv) for kk, vv in v.items()} for k, v in CAP.items()},
+                       meses={k: [dict(data=x["data"].isoformat(), ent=x["ent"], sai=x["sai"], livre=x["livre"]) for x in v["meses"]] for k, v in CEN.items()},
+                       linhas=[dict(id=l["id"], nome=l["nome"], origem=l["origem"], quem=l["quem"], valor=l["valor"], mensal_eq=l["mensal_eq"], impl=l["impl"], grupo=l["grupo"], ativo=l["ativo"]) for l in linhas]),
+                  open(os.environ["LIV_DUMP"], "w"), ensure_ascii=False, indent=1, default=str)
     # ---- render
     MESN = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
     def pill_orig(o, quem):
@@ -359,8 +365,6 @@ footer{{font-size:12px;color:var(--ink-3);margin-top:24px}}
 </div>'''
 open(os.path.join(HERE, "cotacoes-liv-conselho.html"), "w", encoding="utf-8").write(page)
 # versão completa (documento HTML) para hospedagem no GitHub Pages
-full = "<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\">" + page.replace("<title>", "<title>", 1) + "</head><body></body></html>"
-# move o conteúdo visual para o body: tudo após </style> pertence ao body
 head_part, body_part = page.split("</style>", 1)
 full = "<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\">" + head_part + "</style></head><body>" + body_part + "</body></html>"
 open(os.path.join(HERE, "index.html"), "w", encoding="utf-8").write(full)
