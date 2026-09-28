@@ -1,10 +1,10 @@
 {
-  "_comentario": "Premissas do orçamento, fluxo de caixa e capital de giro exibidos na página do conselho. Edite aqui e faça upload no GitHub; a rotina de publicação recalcula tudo. Valores em R$; percentuais em fração (0.10 = 10%). FORA DO ORÇAMENTO por decisão do síndico (18/09/2026): gás/GLP — fornecimento e cobrança individual por unidade, direto pela distribuidora, sem cotação pelo condomínio; manutenção de elevadores (mensal e RIA/ART) — fica com a fabricante do equipamento para não perder a garantia; manutenção elétrica/hidráulica/predial e laudo do SPDA — sem previsão de levantamento de demanda/orçamento. As linhas 'elevadores', 'elev_ria', 'predial' e 'spda' foram removidas; reincluir aqui se a decisão mudar. 25/09/2026 (manhã da AGE): série mensal de caixa, necessidade de caixa mínimo e folga do fundo de instalação RECALCULADAS com gen_conselho.py sobre este arquivo e o banco do painel (55 fornecedores), incluindo a decisão do Conselho de 24/09 (Atlanta portaria remota R$ 5.500 e zeladoria R$ 21.300) e a 2ª proposta de piscina (Edson, R$ 800).",
+  "_comentario": "Premissas do orçamento, fluxo de caixa e capital de giro exibidos na página do conselho. Edite aqui e faça upload no GitHub; a rotina de publicação recalcula tudo. Valores em R$; percentuais em fração (0.10 = 10%). FORA DO ORÇAMENTO por decisão do síndico (18/09/2026): gás/GLP — fornecimento e cobrança individual por unidade, direto pela distribuidora, sem cotação pelo condomínio; manutenção de elevadores (mensal e RIA/ART) — fica com a fabricante do equipamento para não perder a garantia; manutenção elétrica/hidráulica/predial e laudo do SPDA — sem previsão de levantamento de demanda/orçamento. As linhas 'elevadores', 'elev_ria', 'predial' e 'spda' foram removidas; reincluir aqui se a decisão mudar. 25/09/2026 (manhã da AGE): série mensal de caixa, necessidade de caixa mínimo e folga do fundo de instalação RECALCULADAS com gen_conselho.py sobre este arquivo e o banco do painel (55 fornecedores), incluindo a decisão do Conselho de 24/09 (Atlanta portaria remota R$ 5.500 e zeladoria R$ 21.300) e a 2ª proposta de piscina (Edson, R$ 800). 28/09/2026: propostas revisadas do Grupo Atlanta (escolhido na AGE de 25/09) — portaria remota R$ 5.500 → R$ 5.000/mês e zeladoria (3 postos) R$ 21.300 → R$ 18.300/mês; orçamento, taxa, série de caixa, necessidade de caixa mínimo e folga do fundo recalculados com gen_conselho.py sobre este arquivo e o banco do painel.",
   "unidades": 32,
   "unidades_isentas": 0,
   "taxa_construtora": 1200,
-  "taxa_adotada": 1652,
-  "_taxa_adotada_obs": "Taxa necessária calculada a partir do orçamento das propostas recebidas (item 5 da pauta da AGE de 25/09/2026) — substitui a referência de R$ 1.200 da construtora para fins de projeção de fluxo de caixa. Histórico: R$ 1.654 (5ª atualização, 16/09) → R$ 1.644 (6ª, 18/09, 1ª proposta de piscina a R$ 850) → R$ 1.543 (7ª, 18/09, retirada de elevadores, RIA, manutenção predial e SPDA do orçamento; mantida na 8ª, 23/09) → R$ 1.670 (24/09, manhã: Conselho recomendou contratar Atlanta para portaria remota, R$ 5.980, e zeladoria com 3 postos, R$ 21.300) → R$ 1.654 (24/09, tarde: Atlanta ajustou a portaria remota para R$ 5.500/mês) → R$ 1.652 (25/09, manhã: 2ª proposta de piscina, Tratamento Piscinas Edson, R$ 800/mês, R$ 50 abaixo do Anderson). Ajuste aqui se a assembleia fixar valor diferente.",
+  "taxa_adotada": 1530,
+  "_taxa_adotada_obs": "Taxa necessária calculada a partir do orçamento das propostas recebidas (item 5 da pauta da AGE de 25/09/2026) — substitui a referência de R$ 1.200 da construtora para fins de projeção de fluxo de caixa. Histórico: R$ 1.654 (5ª atualização, 16/09) → R$ 1.644 (6ª, 18/09, 1ª proposta de piscina a R$ 850) → R$ 1.543 (7ª, 18/09, retirada de elevadores, RIA, manutenção predial e SPDA do orçamento; mantida na 8ª, 23/09) → R$ 1.670 (24/09, manhã: Conselho recomendou contratar Atlanta para portaria remota, R$ 5.980, e zeladoria com 3 postos, R$ 21.300) → R$ 1.654 (24/09, tarde: Atlanta ajustou a portaria remota para R$ 5.500/mês) → R$ 1.652 (25/09, manhã: 2ª proposta de piscina, Tratamento Piscinas Edson, R$ 800/mês, R$ 50 abaixo do Anderson) → R$ 1.530 (28/09: propostas revisadas do Grupo Atlanta, escolhido na AGE de 25/09 — portaria remota R$ 5.000 e zeladoria 3 postos R$ 18.300). Ajuste aqui se a assembleia fixar valor diferente.",
   "fundo_reserva": 0.1,
   "inicio_servicos": "2026-10-01",
   "dia_vencimento_boleto": 10,
@@ -60,12 +60,12 @@
         "Alarmes"
       ],
       "tipo": "Prestador",
-      "est_min": 21300,
-      "est_max": 21300,
+      "est_min": 18300,
+      "est_max": 18300,
       "freq": 1,
       "primeira": 1,
-      "fixado_em": "Grupo Atlanta — recomendação do Conselho Fiscal e Consultivo (24/09/2026)",
-      "fonte": "Decisão do Conselho Fiscal e Consultivo (24/09/2026): contratar o Grupo Atlanta, com 3 postos de zeladoria — R$ 7.100/posto × 3 = R$ 21.300/mês (mesmo critério de equivalência a 3 postos já usado nas demais propostas da categoria). Substitui a indicação anterior pela menor proposta (S.O.P Digital Service, R$ 18.600) — diferença de R$ 2.700/mês. Propostas recebidas para comparação: S.O.P R$ 18.600 · Grupo Proteção R$ 18.900 · Anelo R$ 19.860 (2 postos cotados) · OnlinePort R$ 20.400 (2 postos cotados) · Atlanta R$ 21.300 (1 posto cotado, extrapolado para 3). Em andamento: Wersatil, Apolo — não alteram a decisão do Conselho."
+      "fixado_em": "Grupo Atlanta — escolhido na AGE de 25/09/2026 (proposta revisada de 28/09/2026)",
+      "fonte": "Grupo Atlanta escolhido na AGE de 25/09/2026, conforme recomendação do Conselho Fiscal e Consultivo (24/09/2026). Proposta REVISADA de 28/09/2026 (Eli Tabaroski): servente de limpeza com acúmulo de função, 3 postos de 44 h semanais (segunda a sábado ao meio-dia), 3 efetivos, R$ 6.100/posto × 3 = R$ 18.300/mês, agora cotados formalmente para os 3 postos; inclui uniformes, identificação, supervisão periódica e encargos. Histórico: 1 posto a R$ 7.100 (10/09), extrapolado para 3 postos = R$ 21.300 na recomendação do Conselho → R$ 18.300 na proposta revisada (−R$ 3.000/mês). Passa a ser a menor proposta da categoria: Atlanta R$ 18.300 · S.O.P R$ 18.600 · Grupo Proteção R$ 18.900 · Anelo R$ 19.860 (2 postos cotados) · OnlinePort R$ 20.400 (2 postos cotados). Proposta sem prazo de contrato nem validade; materiais de limpeza por conta do condomínio."
     },
     {
       "id": "limpeza_pesada",
@@ -141,14 +141,14 @@
       "campo": "valorMensal",
       "tipo": "Prestador",
       "portaria": "Remota",
-      "est_min": 5500,
-      "est_max": 5500,
+      "est_min": 5000,
+      "est_max": 5000,
       "freq": 1,
       "primeira": 1,
       "implantacao_campo": "valorAvulso",
       "implantacao_est": 0,
-      "fixado_em": "Grupo Atlanta — recomendação do Conselho (24/09/2026), preço ajustado para R$ 5.500",
-      "fonte": "SEM implantação (equipamentos em comodato). Decisão do Conselho Fiscal e Consultivo (24/09/2026): contratar o Grupo Atlanta (orçamento nº 013405448437099695), equipamentos em comodato, sem taxa de instalação. Proposta original R$ 5.980/mês; AJUSTADA no mesmo dia (24/09/2026, negociação posterior) para R$ 5.500/mês — confirmar por escrito a formalização desse novo valor antes de assinar. Escopo mais amplo que as demais propostas (módulo Cortex, gerador com autonomia de até 12h, motorização das portas social e deslizante, 4 fechaduras eletroímã, DVR 14 dias e até 12 câmeras). Mesmo após o ajuste, ainda R$ 500/mês acima do empate de preço Fast/OnlinePort (R$ 5.000). Propostas recebidas para comparação: OnlinePort R$ 5.000 (revalidação e mapa pendentes) · Fast Portaria R$ 5.000 (proposta revisada de 21/09, mapa e vistoria por escrito; opcionais fora do orçamento: facial nos elevadores R$ 450/mês e monitoramento perimetral R$ 300/mês) · Atlanta R$ 5.500 (proposta ajustada, mapa original entregue em 18/09)."
+      "fixado_em": "Grupo Atlanta — escolhido na AGE de 25/09/2026 (proposta revisada, R$ 5.000)",
+      "fonte": "SEM implantação (equipamentos em comodato, instalação e mão de obra inclusas). Grupo Atlanta escolhido na AGE de 25/09/2026, conforme recomendação do Conselho Fiscal e Consultivo (24/09/2026). Proposta REVISADA recebida em 28/09/2026 (orçamento nº 013405, documento datado de 22/09/2026): Portaria Remota Inteligente 24h por R$ 5.000/mês; controle individual opcional R$ 70/unidade (fora do orçamento); validade 30 dias; infraestrutura civil, se necessária, por conta do condomínio. Histórico: R$ 5.980 (14/09) → R$ 5.500 (ajuste de 24/09, tarde) → R$ 5.000 (proposta revisada por escrito) — agora no mesmo valor da Fast e da OnlinePort (R$ 5.000), com escopo mais amplo. Equipamentos em comodato listados na proposta revisada: módulo Cortex V6, 5 endpoints, porta social giro, 12 câmeras Full Color + DVR 16 canais/2 TB, 5 interfones IP, gerador 3,8 kVA com 4 ATS, nobreak, motor deslizante, 5 leitores faciais ID Face Pro, 4 fechaduras eletroímã, sensores, fotocélulas e cabeamento. Pendente: prazo de contrato (não informado)."
     },
     {
       "id": "portaria_presencial",
