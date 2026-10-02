@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Agenda de entregas e montagem · Condomínio LIV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Quadro de programação de obra: semana em cinco colunas (seg a sex) ou mês em grade;
+   cada dia tem a vaga única de entrega e os acessos de montagem. */
+:root {
+  --bg: #EEF1EF; --surface: #FBFCFB; --sunk: #E4E9E6; --ink: #1B2522; --muted: #55635D; --line: #CFD7D2;
+  --accent: #0E5F5B; --accent-ink: #FFFFFF;
+  --wood: #824A11; --wood-bg: #F5E6D2; --stone: #3A5270; --stone-bg: #DFE7F1;
+  --ok: #1F6740; --ok-bg: #DCEFE3; --warn: #8F4B04; --warn-bg: #FBEAD0; --danger: #A5302A;
+  --display: 'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', sans-serif;
+  --body: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #111615; --surface: #1A211F; --sunk: #151B1A; --ink: #E4EBE8; --muted: #9BAAA4; --line: #2D3835;
+  --accent: #63C7BF; --accent-ink: #0B1A19;
+  --wood: #E6B273; --wood-bg: #38291A; --stone: #A9BEDA; --stone-bg: #212C3A;
+  --ok: #7FD6A3; --ok-bg: #183326; --warn: #F0B569; --warn-bg: #3A2A14; --danger: #F2928A;
+  color-scheme: dark } }
+
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+html { -webkit-text-size-adjust: 100% }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45; }
+.pagina { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 48px; display: flex; flex-direction: column; gap: 20px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Topo */
+.topo { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.sobre { font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(30px, 5vw, 42px); line-height: 1; margin: 2px 0 0; letter-spacing: .01em; text-wrap: balance; }
+.papel { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 13px; color: var(--muted); text-align: right; }
+.papel-linha { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.selo { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-weight: 500; }
+.selo::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.selo.edita::before { background: var(--accent); }
+.elo { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 13px; }
+.elo:hover { text-decoration: underline; }
+
+/* Barra de navegação */
+.barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.periodo { font-family: var(--display); font-weight: 600; font-size: 22px; margin: 0 8px 0 0; min-width: 0; }
+.lado { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 7px 12px; cursor: pointer; font-weight: 500; line-height: 1.2; }
+.btn:hover { border-color: var(--accent); }
+.btn.pri { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.perigo { color: var(--danger); }
+.btn.seta { padding: 7px 11px; font-family: var(--display); font-size: 17px; }
+.btn[disabled] { opacity: .45; cursor: default; border-color: var(--line); }
+.vistas { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.vistas button { border: 0; background: none; padding: 7px 14px; cursor: pointer; font-weight: 600; }
+.vistas button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.filtro { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+.filtro input { width: 78px; border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; background: var(--surface); font-variant-numeric: tabular-nums; }
+.acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.aviso { border: 1px dashed var(--line); border-radius: 8px; padding: 10px 14px; color: var(--muted); background: var(--surface); }
+.aviso.erro-carga { border-color: var(--warn); color: var(--warn); }
+
+/* Minha agenda */
+.minha { border: 1px solid var(--accent); border-radius: 8px; background: var(--surface); padding: 14px 16px; }
+.minha h2 { margin: 0 0 8px; }
+.minha ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.minha li + li { border-top: 1px solid var(--line); }
+.minha-item { display: grid; grid-template-columns: 118px minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; width: 100%; border: 0; background: none; text-align: left; padding: 8px 0; cursor: pointer; }
+.minha-item:hover .mi-o { text-decoration: underline; }
+.mi-q { font-variant-numeric: tabular-nums; font-weight: 600; }
+.mi-d { color: var(--muted); overflow-wrap: anywhere; }
+
+/* Resumo */
+.resumo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); margin: 0; }
+.resumo > div { padding: 12px 16px; min-width: 0; }
+.resumo > div + div { border-left: 1px solid var(--line); }
+.resumo dt { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.resumo dd { margin: 2px 0 0; font-weight: 500; overflow-wrap: anywhere; }
+.resumo dd b { font-family: var(--display); font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; margin-right: 4px; }
+
+/* Semana */
+.quadro { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.dia { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; display: flex; flex-direction: column; min-width: 0; }
+.dia.hoje { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.dia-cab { display: flex; align-items: baseline; gap: 8px; padding: 10px 12px 8px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.dia-sem { font-family: var(--display); font-weight: 700; font-size: 22px; text-transform: uppercase; letter-spacing: .04em; }
+.dia-data { font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 500; }
+.dia-hoje { margin-left: auto; font-family: var(--display); font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.dia.passado .dia-sem, .dia.passado .dia-data { color: var(--muted); }
+.faixa { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.faixa + .faixa { border-top: 1px solid var(--line); flex: 1; }
+.faixa-tit { margin: 0; font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.fechado { padding: 14px 12px; color: var(--muted); font-size: 13.5px; }
+
+.cartao { display: flex; flex-direction: column; gap: 2px; text-align: left; width: 100%; border: 1px solid transparent; border-radius: 6px; padding: 9px 10px; min-width: 0; }
+.cartao.marcenaria { background: var(--wood-bg); }
+.cartao.pedras { background: var(--stone-bg); }
+button.cartao { cursor: pointer; }
+button.cartao:hover { border-color: currentColor; }
+.cartao.marcenaria .tipo, .cartao.marcenaria .apto { color: var(--wood); }
+.cartao.pedras .tipo, .cartao.pedras .apto { color: var(--stone); }
+.apto { font-family: var(--display); font-weight: 700; font-size: 21px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tipo { order: -1; font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+.linha { font-size: 13.5px; overflow-wrap: anywhere; }
+.linha.hora { font-variant-numeric: tabular-nums; font-weight: 600; }
+.linha.obs { color: var(--muted); }
+.marcas { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+.marca { font-size: 12px; white-space: nowrap; font-style: normal; font-weight: 600; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+.marca.ok { background: var(--ok-bg); color: var(--ok); border-color: transparent; }
+.marca.alerta { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+.cartao.feito { opacity: .78; }
+.cartao.outro { opacity: .4; }
+.cartao.meu { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+.livre { border: 1px dashed var(--line); border-radius: 6px; padding: 9px 10px; color: var(--muted); font-size: 13.5px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.livre.vaga { color: var(--ok); border-color: var(--ok); font-weight: 600; }
+.mais { border: 0; background: none; color: var(--accent); font-weight: 600; cursor: pointer; padding: 2px 0; text-align: left; font-size: 13.5px; }
+.mais:hover { text-decoration: underline; }
+
+/* Mês */
+.mes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.mes-cab { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 4px; }
+.cel { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 92px; min-width: 0; padding: 6px 7px 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; cursor: pointer; text-align: left; }
+.cel:hover { border-color: var(--accent); }
+.cel.fora { background: transparent; }
+.cel.fora .cel-num { color: var(--muted); font-weight: 500; }
+.cel.passado:not(.hoje) .cel-num { color: var(--muted); }
+.cel.hoje { border-color: var(--accent); }
+.cel.hoje .cel-num { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 0 7px; }
+.cel.sel { box-shadow: 0 0 0 2px var(--accent); border-color: var(--accent); }
+.cel-num { font-family: var(--display); font-weight: 700; font-size: 18px; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.cel-fer { font-size: 12px; color: var(--muted); line-height: 1.2; overflow-wrap: anywhere; }
+.cel-livre { font-size: 12px; font-weight: 600; color: var(--ok); }
+.cel-mont { display: flex; flex-wrap: wrap; gap: 3px; }
+.pil { font-size: 12px; font-style: normal; font-weight: 600; font-variant-numeric: tabular-nums; padding: 0 6px; border-radius: 4px; line-height: 1.5; white-space: nowrap; }
+.pil.marcenaria { background: var(--wood-bg); color: var(--wood); }
+.pil.pedras { background: var(--stone-bg); color: var(--stone); }
+.pil.cheia.marcenaria { background: var(--wood); color: var(--surface); }
+.pil.cheia.pedras { background: var(--stone); color: var(--surface); }
+.pil.neutra { background: var(--sunk); color: var(--muted); }
+.pil.outro { opacity: .35; }
+.pil.meu { outline: 2px solid var(--accent); outline-offset: 1px; }
+.detalhe .dia { flex-direction: row; flex-wrap: wrap; }
+.detalhe .dia-cab { width: 100%; }
+.detalhe .faixa { flex: 1 1 260px; }
+.detalhe .faixa + .faixa { border-top: 0; border-left: 1px solid var(--line); }
+
+/* Legenda, tabela, regras */
+.legenda { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: 13px; align-items: center; }
+.legenda span { display: inline-flex; align-items: center; gap: 6px; }
+h2 { font-family: var(--display); font-weight: 700; font-size: 24px; margin: 0 0 10px; letter-spacing: .01em; }
+.duas { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 22px 28px; align-items: start; }
+.duas > * { min-width: 0; }
+.rolagem { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--sunk); }
+td.apto-cel { font-family: var(--display); font-weight: 700; font-size: 17px; }
+tr.meu td { background: var(--ok-bg); }
+td .sub { color: var(--muted); }
+.regras { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; max-width: 65ch; }
+.regras li { padding-left: 14px; border-left: 2px solid var(--line); }
+.regras b { font-weight: 600; }
+.contato { margin-top: 12px; padding: 10px 14px; border-radius: 8px; background: var(--sunk); overflow-wrap: anywhere; user-select: all; }
+.rodape { color: var(--muted); font-size: 13px; margin: 0; }
+
+/* Diálogos */
+dialog { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); padding: 0; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); }
+dialog::backdrop { background: rgba(8, 14, 13, .55); }
+.form { display: flex; flex-direction: column; gap: 14px; padding: 20px; }
+.form h2 { margin: 0; }
+.campos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.campo.largo { grid-column: 1 / -1; }
+.campo label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.campo input, .campo select, .campo textarea { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; background: var(--bg); width: 100%; min-width: 0; }
+.campo textarea { resize: vertical; min-height: 60px; }
+.campo label.marcar { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: var(--ink); font-weight: 400; }
+.marcar input { margin-top: 3px; width: auto; }
+.dica { font-size: 13px; color: var(--muted); margin: 0; }
+.erro { margin: 0; padding: 9px 12px; border-radius: 6px; background: var(--warn-bg); color: var(--warn); font-weight: 500; }
+.botoes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.botoes .esq { margin-right: auto; }
+
+@media (max-width: 860px) {
+  .quadro { grid-template-columns: minmax(0, 1fr); }
+  .quadro .dia { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .quadro .dia-cab, .quadro .fechado { grid-column: 1 / -1; }
+  .quadro .faixa + .faixa { border-top: 0; border-left: 1px solid var(--line); }
+  .duas { grid-template-columns: minmax(0, 1fr); }
+  .papel { align-items: flex-start; text-align: left; }
+  .papel-linha { justify-content: flex-start; }
+}
+@media (max-width: 520px) {
+  .quadro .dia { display: flex; }
+  .quadro .faixa + .faixa, .detalhe .faixa + .faixa { border-left: 0; border-top: 1px solid var(--line); }
+  .resumo { grid-template-columns: minmax(0, 1fr); }
+  .resumo > div + div { border-left: 0; border-top: 1px solid var(--line); }
+  .campos { grid-template-columns: minmax(0, 1fr); }
+  .periodo { font-size: 19px; width: 100%; }
+  .mes { gap: 4px; }
+  .cel { min-height: 78px; padding: 4px 4px 6px; }
+  .pil { padding: 0 4px; font-size: 11.5px; }
+  .minha-item { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header class="topo">
+    <div>
+      <p class="sobre">Condomínio LIV · Cascavel-PR</p>
+      <h1>Agenda de entregas e montagem</h1>
+    </div>
+    <div class="papel" id="papel"></div>
+  </header>
+
+  <div class="barra">
+    <div class="nav">
+      <p class="periodo" id="periodo"></p>
+      <button class="btn seta" type="button" id="btn-ant" aria-label="Período anterior">‹</button>
+      <button class="btn" type="button" id="btn-hoje">Hoje</button>
+      <button class="btn seta" type="button" id="btn-prox" aria-label="Próximo período">›</button>
+    </div>
+    <div class="lado">
+      <div class="vistas" role="group" aria-label="Visão">
+        <button type="button" id="v-semana" data-vista="semana">Semana</button>
+        <button type="button" id="v-mes" data-vista="mes">Mês</button>
+      </div>
+      <label class="filtro" for="f-apto">Meu apartamento <input id="f-apto" inputmode="numeric" maxlength="4" placeholder="nº" autocomplete="off"></label>
+    </div>
+  </div>
+
+  <div class="acoes" id="acoes" hidden>
+    <button class="btn pri" type="button" data-acao="nova-entrega">Reservar entrega</button>
+    <button class="btn pri" type="button" data-acao="nova-montagem">Agendar montagem</button>
+    <button class="btn" type="button" data-acao="config">Configurações</button>
+  </div>
+
+  <div class="aviso" id="aviso" hidden></div>
+
+  <section class="minha" id="minha" hidden></section>
+
+  <dl class="resumo" id="resumo"></dl>
+
+  <div id="vista"></div>
+
+  <div class="legenda">
+    <span><i class="pil cheia marcenaria">nº</i><i class="pil cheia pedras">nº</i> entrega (cor cheia)</span>
+    <span><i class="pil marcenaria">nº</i><i class="pil pedras">nº</i> montagem (cor clara)</span>
+    <span>marrom = marcenaria · azul = pedras</span>
+    <span><i class="marca ok">Entregue</i> material já no apartamento</span>
+    <span><i class="marca alerta">Aguarda entrega</i> montagem depende de entrega ainda não confirmada</span>
+  </div>
+
+  <div class="duas">
+    <section>
+      <h2>Situação por apartamento</h2>
+      <div id="aptos"></div>
+    </section>
+    <section>
+      <h2>Regras de acesso</h2>
+      <ul class="regras" id="regras"></ul>
+      <div class="contato" id="contato" hidden></div>
+    </section>
+  </div>
+
+  <p class="rodape" id="rodape"></p>
+</div>
+
+<dialog id="dlg-entrar" aria-labelledby="tit-entrar">
+  <form class="form" id="form-entrar" novalidate>
+    <h2 id="tit-entrar">Área do síndico e da engenheira</h2>
+    <p class="dica">A edição usa uma chave de acesso do GitHub (token) com permissão de escrita no repositório da agenda. A chave fica guardada só neste aparelho. Os condôminos não precisam de chave para consultar.</p>
+    <div class="campos">
+      <div class="campo largo"><label for="l-nome">Seu nome (fica registrado em cada alteração)</label><input id="l-nome" maxlength="40" autocomplete="name"></div>
+      <div class="campo largo"><label for="l-token">Chave de acesso (token)</label><input id="l-token" type="password" autocomplete="off" placeholder="github_pat_…"></div>
+    </div>
+    <p class="erro" id="l-erro" role="alert" hidden></p>
+    <div class="botoes">
+      <button class="btn" type="button" data-fechar>Cancelar</button>
+      <button class="btn pri" type="submit" id="l-entrar">Entrar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-entrega" aria-labelledby="tit-entrega">
+  <form class="form" id="form-entrega" novalidate>
+    <h2 id="tit-entrega">Entrega de materiais</h2>
+    <p class="dica">Uma única entrega por dia no prédio, para um apartamento, de segunda a sexta.</p>
+    <div class="campos">
+      <div class="campo"><label for="e-unidade">Apartamento</label><input id="e-unidade" inputmode="numeric" maxlength="4" placeholder="ex.: 1702" autocomplete="off"></div>
+      <div class="campo"><label for="e-tipo">Material</label><select id="e-tipo"><option value="marcenaria">Marcenaria</option><option value="pedras">Pedras</option></select></div>
+      <div class="campo largo"><label for="e-data">Dia da entrega</label><input id="e-data" type="date"></div>
+      <div class="campo"><label for="e-inicio">Início</label><input id="e-inicio" type="time" step="900"></div>
+      <div class="campo"><label for="e-fim">Término previsto</label><input id="e-fim" type="time" step="900"></div>
+      <div class="campo largo"><label for="e-empresa">Empresa / fornecedor</label><input id="e-empresa" maxlength="80" autocomplete="off"></div>
+      <div class="campo largo"><label for="e-obs">Observações</label><textarea id="e-obs" maxlength="240"></textarea></div>
+      <div class="campo largo"><label for="e-status">Situação</label><select id="e-status"><option value="agendada">Agendada</option><option value="entregue">Entregue (material já no apartamento)</option></select></div>
+    </div>
+    <p class="erro" id="e-erro" role="alert" hidden></p>
+    <div class="botoes">
+      <button class="btn perigo esq" type="button" id="e-excluir" hidden>Excluir</button>
+      <button class="btn" type="button" data-fechar>Cancelar</button>
+      <button class="btn pri" type="submit" id="e-salvar">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-montagem" aria-labelledby="tit-montagem">
+  <form class="form" id="form-montagem" novalidate>
+    <h2 id="tit-montagem">Acesso para montagem</h2>
+    <p class="dica">Só para apartamentos com o material já entregue.</p>
+    <div class="campos">
+      <div class="campo"><label for="m-unidade">Apartamento</label><input id="m-unidade" inputmode="numeric" maxlength="4" placeholder="ex.: 802" autocomplete="off"></div>
+      <div class="campo"><label for="m-tipo">Serviço</label><select id="m-tipo"><option value="marcenaria">Marcenaria</option><option value="pedras">Pedras</option></select></div>
+      <div class="campo"><label for="m-de">Primeiro dia</label><input id="m-de" type="date"></div>
+      <div class="campo"><label for="m-ate">Último dia</label><input id="m-ate" type="date"></div>
+      <div class="campo"><label for="m-chegada">Horário de chegada</label><input id="m-chegada" type="time" step="900"></div>
+      <div class="campo"><label for="m-status">Situação</label><select id="m-status"><option value="agendada">Agendada</option><option value="concluida">Concluída</option></select></div>
+      <div class="campo largo"><label for="m-empresa">Empresa / prestador</label><input id="m-empresa" maxlength="80" autocomplete="off"></div>
+      <div class="campo largo"><label class="marcar" for="m-declarado"><input id="m-declarado" type="checkbox"> <span>Material entregue antes de este painel existir (sem reserva registrada aqui)</span></label></div>
+      <div class="campo largo"><label for="m-obs">Observações</label><textarea id="m-obs" maxlength="240"></textarea></div>
+    </div>
+    <p class="erro" id="m-erro" role="alert" hidden></p>
+    <div class="botoes">
+      <button class="btn perigo esq" type="button" id="m-excluir" hidden>Excluir</button>
+      <button class="btn" type="button" data-fechar>Cancelar</button>
+      <button class="btn pri" type="submit" id="m-salvar">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-config" aria-labelledby="tit-config">
+  <form class="form" id="form-config" novalidate>
+    <h2 id="tit-config">Configurações</h2>
+    <div class="campos">
+      <div class="campo largo"><label class="marcar" for="c-morador"><input id="c-morador" type="checkbox"> <span>Já há morador no prédio (horário passa a 08h00–11h30 e 13h30–17h30)</span></label></div>
+      <div class="campo largo"><label for="c-ate">Agenda aberta até</label><input id="c-ate" type="date"></div>
+      <div class="campo largo"><label for="c-contato">Contato para pedir reserva (aparece para os condôminos)</label><input id="c-contato" maxlength="120" placeholder="ex.: WhatsApp do síndico" autocomplete="off"></div>
+    </div>
+    <p class="erro" id="c-erro" role="alert" hidden></p>
+    <div class="botoes">
+      <button class="btn" type="button" data-fechar>Cancelar</button>
+      <button class="btn pri" type="submit" id="c-salvar">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function () {
+  'use strict';
+  /* Onde os dados moram: arquivo agenda.json no ramo "dados" deste repositório. */
+  var GH = { dono: 'mayconnonemacher-ui', repo: 'condominio-liv', ramo: 'dados', arquivo: 'agenda.json' };
+  var API = 'https://api.github.com/repos/' + GH.dono + '/' + GH.repo + '/contents/' + GH.arquivo;
+  var RAW = 'https://raw.githubusercontent.com/' + GH.dono + '/' + GH.repo + '/' + GH.ramo + '/' + GH.arquivo;
+  var INICIO = '2026-09-28';
+  var ATE_PADRAO = '2027-01-31';
+  var FERIADOS = { '2026-10-12': 'N. Sra. Aparecida', '2026-11-02': 'Finados', '2026-11-20': 'Consciência Negra', '2026-12-25': 'Natal', '2027-01-01': 'Confraternização Universal' };
+
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var DIAS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+  var DIAS_L = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+  var MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  var TIPOS = { marcenaria: 'Marcenaria', pedras: 'Pedras' };
+
+  var pad = function (n) { return String(n).padStart(2, '0'); };
+  var iso = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+  var parse = function (s) { var p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2], 12); };
+  var addDays = function (d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  var monday = function (d) { return addDays(d, -((d.getDay() + 6) % 7)); };
+  var diaUtil = function (s) { var g = parse(s).getDay(); return g >= 1 && g <= 5; };
+  var mins = function (t) { var p = String(t || '0:0').split(':').map(Number); return p[0] * 60 + p[1]; };
+  var hora = function (t) { return t ? String(t).replace(':', 'h') : ''; };
+  var dm = function (s) { return s.slice(8, 10) + '/' + s.slice(5, 7); };
+  var dma = function (s) { return dm(s) + '/' + s.slice(0, 4); };
+  var hojeIso = function () { return iso(new Date()); };
+  var tipoDe = function (x) { return x && x.tipo === 'pedras' ? 'pedras' : 'marcenaria'; };
+  var guarda = { ler: function (k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }, por: function (k, v) { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) {} } };
+
+  function normalizar(d) {
+    d = d && typeof d === 'object' ? d : {};
+    d.config = Object.assign({ haMorador: false, contato: '', ate: ATE_PADRAO }, d.config || {});
+    d.entregas = d.entregas && typeof d.entregas === 'object' ? d.entregas : {};
+    d.montagens = d.montagens && typeof d.montagens === 'object' ? d.montagens : {};
+    return d;
+  }
+  var D = normalizar({});
+  var ED = { token: guarda.ler('liv-agenda-token'), nome: guarda.ler('liv-agenda-nome'), ativo: false };
+  var UI = { vista: guarda.ler('liv-agenda-vista') === 'mes' ? 'mes' : 'semana', semana: null, mes: '', dia: '', apto: guarda.ler('liv-agenda-apto').replace(/\D/g, ''), estado: 'carregando', conferido: null };
+
+  /* ---------- calendário ---------- */
+  function ate() { return /^\d{4}-\d{2}-\d{2}$/.test(D.config.ate || '') ? D.config.ate : ATE_PADRAO; }
+  function feriado(s) { return (D.config.feriados || FERIADOS)[s] || ''; }
+  function aberto(s) { return diaUtil(s) && !feriado(s) && s >= INICIO && s <= ate(); }
+  function semanaMin() { return monday(parse(INICIO)); }
+  function semanaMax() { return monday(parse(ate())); }
+  function mesMin() { return iso(addDays(parse(INICIO), 4)).slice(0, 7); }
+  function mesMax() { return ate().slice(0, 7); }
+  function limitarSemana(d) { var a = semanaMin(), b = semanaMax(); return d < a ? a : d > b ? b : d; }
+  function limitarMes(ym) { return ym < mesMin() ? mesMin() : ym > mesMax() ? mesMax() : ym; }
+  function somaMes(ym, n) { var p = ym.split('-').map(Number); var d = new Date(p[0], p[1] - 1 + n, 1, 12); return iso(d).slice(0, 7); }
+  function diasDaSemana() { var out = []; for (var i = 0; i < 5; i++) out.push(iso(addDays(UI.semana, i))); return out; }
+  function semanasDoMes(ym) {
+    var p = ym.split('-').map(Number), ultimo = new Date(p[0], p[1], 0, 12), seg = monday(new Date(p[0], p[1] - 1, 1, 12)), linhas = [];
+    while (seg <= ultimo) {
+      var l = []; for (var i = 0; i < 5; i++) l.push(iso(addDays(seg, i)));
+      if (l.some(function (s) { return s.slice(0, 7) === ym; })) linhas.push(l);
+      seg = addDays(seg, 7);
+    }
+    return linhas;
+  }
+  (function () {
+    var h = new Date(), g = h.getDay(), base = g === 6 ? addDays(h, 2) : g === 0 ? addDays(h, 1) : h;
+    UI.semana = limitarSemana(monday(base)); UI.mes = limitarMes(iso(base).slice(0, 7)); UI.dia = iso(base);
+  })();
+
+  /* ---------- regras ---------- */
+  function janelas() { return D.config.haMorador ? [[480, 690], [810, 1050]] : [[450, 1050]]; }
+  function textoJanelas() { return D.config.haMorador ? '08h00–11h30 e 13h30–17h30' : '07h30–17h30'; }
+  function janelaDe(t) { var m = mins(t); return janelas().filter(function (j) { return m >= j[0] && m <= j[1]; })[0] || null; }
+  function montagensDoDia(s) {
+    if (!diaUtil(s) || feriado(s)) return [];
+    return Object.keys(D.montagens).map(function (id) { return Object.assign({ id: id }, D.montagens[id]); })
+      .filter(function (m) { return m.de && m.de <= s && (m.ate || m.de) >= s; })
+      .sort(function (a, b) { return mins(a.chegada) - mins(b.chegada) || String(a.unidade).localeCompare(String(b.unidade)); });
+  }
+  function entregaAte(unidade, tipo, limite) {
+    var achou = null;
+    Object.keys(D.entregas).sort().forEach(function (d) {
+      var e = D.entregas[d];
+      if (!achou && String(e.unidade) === String(unidade) && tipoDe(e) === tipo && d <= limite) achou = Object.assign({ data: d }, e);
+    });
+    return achou;
+  }
+  function materialDe(m) {
+    if (m.materiaisDeclarados) return { k: 'declarado' };
+    var e = entregaAte(m.unidade, tipoDe(m), m.de);
+    if (!e) return { k: 'sem' };
+    return { k: e.status === 'entregue' ? 'entregue' : 'agendada', data: e.data };
+  }
+  function motivoFechado(s) {
+    if (!diaUtil(s)) return 'Entregas e montagem só de segunda a sexta.';
+    if (feriado(s)) return 'O dia ' + dm(s) + ' é feriado (' + feriado(s) + ').';
+    if (s < INICIO || s > ate()) return 'A agenda está aberta até ' + dma(ate()) + '.';
+    return '';
+  }
+  function validarEntrega(f, original) {
+    if (!/^\d{3,4}$/.test(f.unidade)) return 'Informe o número do apartamento (ex.: 1702).';
+    if (!f.data) return 'Escolha o dia da entrega.';
+    var fechado = motivoFechado(f.data); if (fechado) return fechado + ' Escolha outro dia.';
+    if (!f.inicio || !f.fim) return 'Informe o horário de início e o término previsto.';
+    if (mins(f.fim) <= mins(f.inicio)) return 'O término precisa ser depois do início.';
+    var j = janelaDe(f.inicio);
+    if (!j || mins(f.fim) > j[1]) return 'Horário fora do permitido (' + textoJanelas() + ').';
+    if (f.data !== original && D.entregas[f.data]) return 'O dia ' + dm(f.data) + ' já tem a entrega do apto ' + D.entregas[f.data].unidade + '. Só uma entrega por dia: escolha outra data.';
+    return '';
+  }
+  function validarMontagem(f) {
+    if (!/^\d{3,4}$/.test(f.unidade)) return 'Informe o número do apartamento (ex.: 802).';
+    if (!f.de || !f.ate) return 'Informe o primeiro e o último dia.';
+    if (f.ate < f.de) return 'O último dia não pode ser antes do primeiro.';
+    var a = motivoFechado(f.de), b = motivoFechado(f.ate);
+    if (a) return 'Primeiro dia: ' + a;
+    if (b) return 'Último dia: ' + b;
+    if (!f.chegada) return 'Informe o horário de chegada.';
+    if (!janelaDe(f.chegada)) return 'Horário de chegada fora do permitido (' + textoJanelas() + ').';
+    if (f.status !== 'concluida' && !f.materiaisDeclarados && !entregaAte(f.unidade, f.tipo, f.de))
+      return 'Não há entrega de ' + TIPOS[f.tipo].toLowerCase() + ' registrada para o apto ' + f.unidade + ' até ' + dm(f.de) + '. Reserve a entrega antes ou marque que o material já foi entregue.';
+    return '';
+  }
+
+  /* ---------- GitHub ---------- */
+  function cab(extra) { var h = Object.assign({ Accept: 'application/vnd.github+json' }, extra || {}); if (ED.token) h.Authorization = 'Bearer ' + ED.token; return h; }
+  function paraB64(txt) { var b = new TextEncoder().encode(txt), s = ''; for (var i = 0; i < b.length; i += 8192) s += String.fromCharCode.apply(null, b.subarray(i, i + 8192)); return btoa(s); }
+  function deB64(b64) { var s = atob(String(b64).replace(/\s/g, '')), b = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i); return new TextDecoder().decode(b); }
+  async function ghLer() {
+    var r = await fetch(API + '?ref=' + GH.ramo, { headers: cab(), cache: 'no-store' });
+    if (!r.ok) throw { status: r.status };
+    var j = await r.json();
+    return { sha: j.sha, dados: normalizar(JSON.parse(deB64(j.content))) };
+  }
+  async function ghGravar(dados, sha, msg) {
+    var r = await fetch(API, { method: 'PUT', headers: cab({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ message: msg, content: paraB64(JSON.stringify(dados, null, 1) + '\n'), sha: sha, branch: GH.ramo }) });
+    if (!r.ok) throw { status: r.status };
+  }
+  // leitura pública (condôminos): API do GitHub, com o arquivo bruto como reserva
+  async function lerPublico() {
+    try {
+      var r = await fetch(API + '?ref=' + GH.ramo, { headers: { Accept: 'application/vnd.github.raw+json' }, cache: 'no-cache' });
+      if (!r.ok) throw 0;
+      return normalizar(await r.json());
+    } catch (e) {
+      var r2 = await fetch(RAW + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!r2.ok) throw { status: r2.status };
+      return normalizar(await r2.json());
+    }
+  }
+  var lendo = false;
+  async function atualizar() {
+    if (lendo || document.querySelector('dialog[open]')) return;
+    lendo = true;
+    try {
+      if (ED.ativo) { try { D = (await ghLer()).dados; } catch (e) { if (e && e.status === 401) sair(); D = await lerPublico(); } }
+      else D = await lerPublico();
+      UI.estado = 'ok'; UI.conferido = new Date();
+    } catch (e) { if (UI.estado !== 'ok') UI.estado = 'erro'; }
+    lendo = false;
+    UI.semana = limitarSemana(UI.semana); UI.mes = limitarMes(UI.mes);
+    render();
+  }
+  // grava uma alteração: relê o arquivo, aplica, valida de novo e salva; se outra pessoa salvou no meio, repete uma vez
+  async function gravar(mut, msg, idErro, dlg, btn) {
+    btn.disabled = true;
+    try {
+      for (var i = 0; ; i++) {
+        var c = await ghLer(); D = c.dados;
+        var m = mut();
+        if (m) { render(); erro(idErro, m); break; }
+        D.atualizadoEm = new Date().toISOString();
+        try { await ghGravar(D, c.sha, msg + (ED.nome ? ' (' + ED.nome + ')' : '')); UI.conferido = new Date(); $(dlg).close(); render(); break; }
+        catch (e) { if (e && e.status === 409 && i < 1) continue; throw e; }
+      }
+    } catch (e) {
+      var s = e && e.status;
+      erro(idErro, s === 401 ? 'A chave de acesso não é mais válida. Saia e entre de novo com uma chave nova.'
+        : (s === 403 || s === 404) ? 'Esta chave não tem permissão de escrita na agenda. Confira a permissão "Contents: Read and write" do token.'
+        : s === 409 ? 'Outra pessoa salvou ao mesmo tempo. Tente de novo.'
+        : 'Não foi possível salvar agora. Confira a conexão e tente de novo.');
+      try { D = (await ghLer()).dados; } catch (e2) {}
+      render();
+    }
+    btn.disabled = false;
+  }
+  function sair() { ED.token = ''; ED.ativo = false; guarda.por('liv-agenda-token', ''); }
+
+  /* ---------- desenho ---------- */
+  function marcaFiltro(u) { return UI.apto ? (String(u) === UI.apto ? ' meu' : ' outro') : ''; }
+  function marcaMaterial(m) {
+    if (m.status === 'concluida') return '<span class="marca ok">Concluída</span>';
+    var mat = materialDe(m);
+    if (mat.k === 'sem') return '<span class="marca alerta">Sem entrega registrada</span>';
+    if (mat.k === 'agendada') return '<span class="marca alerta">Aguarda entrega de ' + dm(mat.data) + '</span>';
+    return '';
+  }
+  function cartaoEntrega(dia, e) {
+    var t = tipoDe(e), tag = ED.ativo ? 'button' : 'div';
+    var at = ED.ativo ? ' type="button" data-acao="editar-entrega" data-id="' + esc(dia) + '" aria-label="Editar entrega do apto ' + esc(e.unidade) + '"' : '';
+    return '<' + tag + ' class="cartao ' + t + (e.status === 'entregue' ? ' feito' : '') + marcaFiltro(e.unidade) + '"' + at + '>' +
+      '<span class="apto">Apto ' + esc(e.unidade) + '</span><span class="tipo">' + TIPOS[t] + '</span>' +
+      '<span class="linha hora">' + hora(e.inicio) + '–' + hora(e.fim) + '</span>' +
+      (e.empresa ? '<span class="linha">' + esc(e.empresa) + '</span>' : '') +
+      (e.obs ? '<span class="linha obs">' + esc(e.obs) + '</span>' : '') +
+      '<span class="marcas"><span class="marca' + (e.status === 'entregue' ? ' ok' : '') + '">' + (e.status === 'entregue' ? 'Entregue' : 'Agendada') + '</span></span>' +
+      '</' + tag + '>';
+  }
+  function cartaoMontagem(m) {
+    var t = tipoDe(m), tag = ED.ativo ? 'button' : 'div';
+    var at = ED.ativo ? ' type="button" data-acao="editar-montagem" data-id="' + esc(m.id) + '" aria-label="Editar montagem do apto ' + esc(m.unidade) + '"' : '';
+    var varios = (m.ate || m.de) !== m.de, marca = marcaMaterial(m);
+    return '<' + tag + ' class="cartao ' + t + (m.status === 'concluida' ? ' feito' : '') + marcaFiltro(m.unidade) + '"' + at + '>' +
+      '<span class="apto">Apto ' + esc(m.unidade) + '</span><span class="tipo">' + TIPOS[t] + '</span>' +
+      '<span class="linha hora">chegada ' + hora(m.chegada) + '</span>' +
+      (m.empresa ? '<span class="linha">' + esc(m.empresa) + '</span>' : '') +
+      (varios ? '<span class="linha obs">de ' + dm(m.de) + ' a ' + dm(m.ate) + '</span>' : '') +
+      (m.obs ? '<span class="linha obs">' + esc(m.obs) + '</span>' : '') +
+      (marca ? '<span class="marcas">' + marca + '</span>' : '') +
+      '</' + tag + '>';
+  }
+  function htmlDia(s, longo) {
+    var hoje = hojeIso(), passado = s < hoje, e = D.entregas[s], ms = montagensDoDia(s), d = parse(s);
+    var h = '<section class="dia' + (s === hoje ? ' hoje' : '') + (passado ? ' passado' : '') + '" aria-label="' + DIAS_L[d.getDay()] + ' ' + dm(s) + '">' +
+      '<header class="dia-cab"><span class="dia-sem">' + (longo ? DIAS_L[d.getDay()] : DIAS[d.getDay()]) + '</span><span class="dia-data">' + (longo ? d.getDate() + ' de ' + MESES[d.getMonth()] : dm(s)) + '</span>' +
+      (s === hoje ? '<span class="dia-hoje">hoje</span>' : '') + '</header>';
+    if (!aberto(s)) return h + '<div class="fechado">' + (feriado(s) ? 'Feriado: ' + esc(feriado(s)) + '. Sem entregas nem montagem.' : !diaUtil(s) ? 'Sem entregas nem montagem no fim de semana.' : 'Fora do período da agenda.') + '</div></section>';
+    h += '<div class="faixa"><h3 class="faixa-tit">Entrega de materiais</h3>';
+    if (e) h += cartaoEntrega(s, e);
+    else if (passado) h += '<div class="livre">Sem entrega</div>';
+    else h += '<div class="livre vaga"><span>Dia livre</span>' + (ED.ativo ? '<button class="mais" type="button" data-acao="nova-entrega" data-dia="' + s + '">Reservar</button>' : '') + '</div>';
+    h += '</div><div class="faixa"><h3 class="faixa-tit"><span>Montagem</span><span>' + (ms.length ? ms.length : '') + '</span></h3>';
+    h += ms.length ? ms.map(cartaoMontagem).join('') : '<div class="livre">Nenhum prestador</div>';
+    if (ED.ativo) h += '<button class="mais" type="button" data-acao="nova-montagem" data-dia="' + s + '">+ Agendar montagem</button>';
+    return h + '</div></section>';
+  }
+  function htmlCel(s, ym) {
+    var hoje = hojeIso(), e = D.entregas[s], ms = montagensDoDia(s), fer = feriado(s), d = parse(s);
+    var cls = 'cel' + (s.slice(0, 7) !== ym ? ' fora' : '') + (s === hoje ? ' hoje' : '') + (s === UI.dia ? ' sel' : '') + (s < hoje ? ' passado' : '');
+    var h = '<button type="button" class="' + cls + '" data-acao="dia" data-dia="' + s + '" aria-label="' + DIAS_L[d.getDay()] + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()] + '"><span class="cel-num">' + d.getDate() + '</span>';
+    if (fer) h += '<span class="cel-fer">' + esc(fer) + '</span>';
+    else if (aberto(s)) {
+      if (e) h += '<span class="pil cheia ' + tipoDe(e) + marcaFiltro(e.unidade) + '">' + esc(e.unidade) + '</span>';
+      else if (s >= hoje) h += '<span class="cel-livre">livre</span>';
+      if (ms.length) {
+        var meus = UI.apto ? ms.filter(function (m) { return String(m.unidade) === UI.apto; }) : [], lista = meus.concat(ms.filter(function (m) { return meus.indexOf(m) < 0; }));
+        h += '<span class="cel-mont">' + lista.slice(0, 3).map(function (m) { return '<span class="pil ' + tipoDe(m) + marcaFiltro(m.unidade) + '">' + esc(m.unidade) + '</span>'; }).join('') +
+          (lista.length > 3 ? '<span class="pil neutra">+' + (lista.length - 3) + '</span>' : '') + '</span>';
+      }
+    }
+    return h + '</button>';
+  }
+
+  function renderMinha() {
+    var el = $('#minha');
+    if (!UI.apto) { el.hidden = true; return; }
+    var itens = [];
+    Object.keys(D.entregas).forEach(function (d) { var e = D.entregas[d]; if (String(e.unidade) === UI.apto)
+      itens.push({ dia: d, q: DIAS[parse(d).getDay()] + ' ' + dm(d), o: 'Entrega de ' + TIPOS[tipoDe(e)].toLowerCase(), d: hora(e.inicio) + '–' + hora(e.fim) + (e.empresa ? ' · ' + e.empresa : ''), s: e.status === 'entregue' ? '<span class="marca ok">Entregue</span>' : '<span class="marca">Agendada</span>' }); });
+    Object.keys(D.montagens).forEach(function (id) { var m = D.montagens[id]; if (String(m.unidade) === UI.apto)
+      itens.push({ dia: m.de, q: dm(m.de) + ((m.ate || m.de) !== m.de ? ' a ' + dm(m.ate) : ''), o: 'Montagem de ' + TIPOS[tipoDe(m)].toLowerCase(), d: 'chegada ' + hora(m.chegada) + (m.empresa ? ' · ' + m.empresa : ''), s: marcaMaterial(m) || '<span class="marca">Agendada</span>' }); });
+    itens.sort(function (a, b) { return a.dia < b.dia ? -1 : a.dia > b.dia ? 1 : 0; });
+    el.hidden = false;
+    el.innerHTML = '<h2>Agenda do apto ' + esc(UI.apto) + '</h2>' + (itens.length
+      ? '<ul>' + itens.map(function (i) { return '<li><button type="button" class="minha-item" data-acao="ir" data-dia="' + i.dia + '"><span class="mi-q">' + i.q + '</span><span><span class="mi-o">' + i.o + '</span> <span class="mi-d">' + esc(i.d) + '</span></span><span>' + i.s + '</span></button></li>'; }).join('') + '</ul>'
+      : '<p class="dica">Nenhuma entrega ou montagem registrada para este apartamento até ' + dma(ate()) + '.</p>');
+  }
+  function renderAptos() {
+    var mapa = {};
+    var pega = function (u) { u = String(u); return mapa[u] || (mapa[u] = { marcenaria: { e: [], m: [] }, pedras: { e: [], m: [] } }); };
+    Object.keys(D.entregas).sort().forEach(function (d) { var e = D.entregas[d]; pega(e.unidade)[tipoDe(e)].e.push(dm(d) + ' <span class="sub">' + (e.status === 'entregue' ? 'entregue' : 'agendada') + '</span>'); });
+    Object.keys(D.montagens).map(function (id) { return D.montagens[id]; }).sort(function (a, b) { return a.de < b.de ? -1 : 1; }).forEach(function (m) {
+      var alvo = pega(m.unidade)[tipoDe(m)];
+      alvo.m.push(dm(m.de) + ((m.ate || m.de) !== m.de ? '–' + dm(m.ate) : '') + ' <span class="sub">' + (m.status === 'concluida' ? 'concluída' : 'agendada') + '</span>');
+      if (m.materiaisDeclarados && !alvo.e.length) alvo.e.push('<span class="sub">antes do painel</span>');
+    });
+    var us = Object.keys(mapa).sort(function (a, b) { return Number(a) - Number(b); });
+    if (!us.length) { $('#aptos').innerHTML = '<div class="aviso">Nenhuma reserva registrada ainda. Cada apartamento aparece aqui com as datas de entrega e de montagem assim que a primeira reserva for lançada.</div>'; return; }
+    var cel = function (l) { return l.length ? l.join('<br>') : '<span class="sub">—</span>'; };
+    $('#aptos').innerHTML = '<div class="rolagem"><table><thead><tr><th rowspan="2">Apto</th><th colspan="2">Marcenaria</th><th colspan="2">Pedras</th></tr><tr><th>Entrega</th><th>Montagem</th><th>Entrega</th><th>Montagem</th></tr></thead><tbody>' +
+      us.map(function (u) { var x = mapa[u]; return '<tr' + (u === UI.apto ? ' class="meu"' : '') + '><td class="apto-cel">' + esc(u) + '</td><td>' + cel(x.marcenaria.e) + '</td><td>' + cel(x.marcenaria.m) + '</td><td>' + cel(x.pedras.e) + '</td><td>' + cel(x.pedras.m) + '</td></tr>'; }).join('') +
+      '</tbody></table></div>';
+  }
+
+  function render() {
+    var hoje = hojeIso(), dias, rot;
+    $('#v-semana').setAttribute('aria-pressed', UI.vista === 'semana');
+    $('#v-mes').setAttribute('aria-pressed', UI.vista === 'mes');
+    if (UI.vista === 'semana') {
+      dias = diasDaSemana(); var a = parse(dias[0]), b = parse(dias[4]);
+      rot = a.getMonth() === b.getMonth() ? a.getDate() + ' a ' + b.getDate() + ' de ' + MESES[b.getMonth()] + ' de ' + b.getFullYear()
+        : a.getDate() + ' de ' + MESES[a.getMonth()] + ' a ' + b.getDate() + ' de ' + MESES[b.getMonth()] + ' de ' + b.getFullYear();
+      $('#vista').innerHTML = '<div class="quadro">' + dias.map(function (s) { return htmlDia(s, false); }).join('') + '</div>';
+      $('#btn-ant').disabled = UI.semana <= semanaMin(); $('#btn-prox').disabled = UI.semana >= semanaMax();
+    } else {
+      var p = UI.mes.split('-').map(Number), linhas = semanasDoMes(UI.mes);
+      rot = MESES[p[1] - 1].charAt(0).toUpperCase() + MESES[p[1] - 1].slice(1) + ' de ' + p[0];
+      dias = [].concat.apply([], linhas).filter(function (s) { return s.slice(0, 7) === UI.mes; });
+      $('#vista').innerHTML = '<div class="mes">' + ['seg', 'ter', 'qua', 'qui', 'sex'].map(function (d) { return '<div class="mes-cab">' + d + '</div>'; }).join('') +
+        linhas.map(function (l) { return l.map(function (s) { return htmlCel(s, UI.mes); }).join(''); }).join('') + '</div>' +
+        '<div class="detalhe" id="detalhe" style="margin-top:14px">' + (UI.dia && diaUtil(UI.dia) ? htmlDia(UI.dia, true) : '<div class="aviso">Toque em um dia para ver os detalhes.</div>') + '</div>';
+      $('#btn-ant').disabled = UI.mes <= mesMin(); $('#btn-prox').disabled = UI.mes >= mesMax();
+    }
+    $('#periodo').textContent = rot;
+    $('#acoes').hidden = !ED.ativo;
+
+    $('#papel').innerHTML = ED.ativo
+      ? '<span class="papel-linha"><span class="selo edita">Edição' + (ED.nome ? ' · ' + esc(ED.nome) : '') + '</span><button class="elo" type="button" data-sair>Sair</button></span><span>As alterações aparecem para os condôminos em instantes</span>'
+      : '<span class="papel-linha"><span class="selo">Consulta</span><button class="elo" type="button" data-entrar>Área do síndico</button></span>' +
+        (UI.conferido ? '<span>Conferido às ' + pad(UI.conferido.getHours()) + 'h' + pad(UI.conferido.getMinutes()) + ' · atualiza sozinho</span>' : '');
+
+    var av = $('#aviso'); av.className = 'aviso';
+    if (UI.estado === 'carregando') { av.hidden = false; av.textContent = 'Carregando a agenda…'; }
+    else if (UI.estado === 'erro') { av.hidden = false; av.className = 'aviso erro-carga'; av.textContent = 'Não foi possível carregar a agenda agora. Confira a conexão e recarregue a página.'; }
+    else av.hidden = true;
+
+    var uteis = dias.filter(aberto);
+    var ocupados = uteis.filter(function (s) { return D.entregas[s]; });
+    var livres = uteis.filter(function (s) { return !D.entregas[s] && s >= hoje; });
+    var aptos = {}; uteis.forEach(function (s) { montagensDoDia(s).forEach(function (m) { aptos[m.unidade] = 1; }); });
+    var nAptos = Object.keys(aptos).length, per = UI.vista === 'semana' ? 'na semana' : 'no mês';
+    $('#resumo').innerHTML =
+      '<div><dt>Entregas ' + per + '</dt><dd><b>' + ocupados.length + '</b>de ' + uteis.length + (uteis.length === 1 ? ' dia útil' : ' dias úteis') + '</dd></div>' +
+      '<div><dt>Dias livres para entrega</dt><dd>' + (UI.vista === 'semana'
+        ? (livres.length ? livres.map(function (s) { return DIAS[parse(s).getDay()] + ' ' + dm(s); }).join(' · ') : 'Nenhum nesta semana')
+        : '<b>' + livres.length + '</b>' + (livres.length === 1 ? 'dia' : 'dias') + (livres.length ? ' · próximo: ' + DIAS[parse(livres[0]).getDay()] + ' ' + dm(livres[0]) : '')) + '</dd></div>' +
+      '<div><dt>Em montagem ' + per + '</dt><dd><b>' + nAptos + '</b>' + (nAptos === 1 ? 'apartamento' : 'apartamentos') + '</dd></div>';
+
+    renderMinha();
+    renderAptos();
+
+    $('#regras').innerHTML =
+      '<li><b>Uma entrega de materiais por dia.</b> Cada dia recebe a entrega de um único apartamento, marcenaria ou pedras. Dia com reserva fica fechado para outra entrega.</li>' +
+      '<li><b>Montagem só depois da entrega.</b> O acesso do prestador é liberado para o apartamento que já recebeu o material correspondente.</li>' +
+      '<li><b>Horário: ' + textoJanelas() + '.</b> De segunda a sexta, exceto feriados.</li>' +
+      '<li><b>Reserva sempre antecipada.</b> O pedido é feito ao síndico ou à engenheira da construtora, que registram aqui. Dano ou mau uso das áreas comuns fica por conta do proprietário.</li>' +
+      '<li><b>Agenda aberta até ' + dma(ate()) + '.</b></li>';
+    var c = $('#contato');
+    if (D.config.contato) { c.hidden = false; c.textContent = 'Para pedir reserva: ' + D.config.contato; } else c.hidden = true;
+
+    var up = D.atualizadoEm ? new Date(D.atualizadoEm) : null;
+    $('#rodape').textContent = (up && !isNaN(up) ? 'Última alteração na agenda: ' + dma(iso(up)) + ' às ' + pad(up.getHours()) + 'h' + pad(up.getMinutes()) + '. ' : '') +
+      'Informe o número do seu apartamento em "Meu apartamento" para ver só a sua agenda.';
+  }
+
+  /* ---------- formulários ---------- */
+  var edit = { entrega: null, montagem: null };
+  function erro(id, msg) { var el = $(id); el.hidden = !msg; el.textContent = msg || ''; return false; }
+  function armarExcluir(btn) { btn.hidden = false; btn.textContent = 'Excluir'; btn.dataset.passo = '0'; }
+  function proximoAberto(s) { var d = parse(s < INICIO ? INICIO : s), n = 0; while (!aberto(iso(d)) && n++ < 30) d = addDays(d, 1); return iso(d); }
+  function limites(el) { el.min = INICIO; el.max = ate(); }
+
+  function abrirEntrega(id, dia) {
+    var e = id ? D.entregas[id] : null;
+    edit.entrega = id || null;
+    $('#tit-entrega').textContent = e ? 'Editar entrega' : 'Reservar entrega de materiais';
+    $('#e-unidade').value = e ? e.unidade : '';
+    $('#e-tipo').value = e ? tipoDe(e) : 'marcenaria';
+    limites($('#e-data')); $('#e-data').value = id || dia || proximoAberto(hojeIso());
+    $('#e-inicio').value = e ? e.inicio : (D.config.haMorador ? '08:00' : '07:30');
+    $('#e-fim').value = e ? e.fim : (D.config.haMorador ? '10:00' : '09:30');
+    $('#e-empresa').value = e ? (e.empresa || '') : '';
+    $('#e-obs').value = e ? (e.obs || '') : '';
+    $('#e-status').value = e && e.status === 'entregue' ? 'entregue' : 'agendada';
+    erro('#e-erro', '');
+    var x = $('#e-excluir'); if (e) armarExcluir(x); else x.hidden = true;
+    $('#dlg-entrega').showModal();
+  }
+  function abrirMontagem(id, dia) {
+    var m = id ? D.montagens[id] : null;
+    edit.montagem = id || null;
+    var d0 = dia || proximoAberto(hojeIso());
+    $('#tit-montagem').textContent = m ? 'Editar acesso para montagem' : 'Agendar acesso para montagem';
+    $('#m-unidade').value = m ? m.unidade : '';
+    $('#m-tipo').value = m ? tipoDe(m) : 'marcenaria';
+    limites($('#m-de')); limites($('#m-ate'));
+    $('#m-de').value = m ? m.de : d0;
+    $('#m-ate').value = m ? (m.ate || m.de) : d0;
+    $('#m-chegada').value = m ? m.chegada : (D.config.haMorador ? '08:00' : '07:30');
+    $('#m-status').value = m && m.status === 'concluida' ? 'concluida' : 'agendada';
+    $('#m-empresa').value = m ? (m.empresa || '') : '';
+    $('#m-declarado').checked = !!(m && m.materiaisDeclarados);
+    $('#m-obs').value = m ? (m.obs || '') : '';
+    erro('#m-erro', '');
+    var x = $('#m-excluir'); if (m) armarExcluir(x); else x.hidden = true;
+    $('#dlg-montagem').showModal();
+  }
+  function salvarEntrega(ev) {
+    ev.preventDefault();
+    var original = edit.entrega;
+    var f = { unidade: $('#e-unidade').value.trim(), tipo: $('#e-tipo').value, data: $('#e-data').value, inicio: $('#e-inicio').value, fim: $('#e-fim').value,
+      empresa: $('#e-empresa').value.trim(), obs: $('#e-obs').value.trim(), status: $('#e-status').value };
+    var msg = validarEntrega(f, original);
+    if (msg) return erro('#e-erro', msg);
+    gravar(function () {
+      var m = validarEntrega(f, original); if (m) return m;
+      if (original && original !== f.data) delete D.entregas[original];
+      D.entregas[f.data] = { unidade: f.unidade, tipo: f.tipo, inicio: f.inicio, fim: f.fim, empresa: f.empresa, obs: f.obs, status: f.status, por: ED.nome };
+      UI.semana = limitarSemana(monday(parse(f.data))); UI.mes = limitarMes(f.data.slice(0, 7)); UI.dia = f.data;
+      return '';
+    }, 'Agenda: entrega apto ' + f.unidade + ' em ' + dm(f.data), '#e-erro', '#dlg-entrega', $('#e-salvar'));
+  }
+  function salvarMontagem(ev) {
+    ev.preventDefault();
+    var id = edit.montagem;
+    var f = { unidade: $('#m-unidade').value.trim(), tipo: $('#m-tipo').value, de: $('#m-de').value, ate: $('#m-ate').value || $('#m-de').value, chegada: $('#m-chegada').value,
+      status: $('#m-status').value, empresa: $('#m-empresa').value.trim(), materiaisDeclarados: $('#m-declarado').checked, obs: $('#m-obs').value.trim() };
+    var msg = validarMontagem(f);
+    if (msg) return erro('#m-erro', msg);
+    gravar(function () {
+      var m = validarMontagem(f); if (m) return m;
+      if (id && !D.montagens[id]) return 'Este agendamento foi excluído por outra pessoa.';
+      D.montagens[id || ('m' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6))] = Object.assign({}, f, { por: ED.nome });
+      UI.semana = limitarSemana(monday(parse(f.de))); UI.mes = limitarMes(f.de.slice(0, 7)); UI.dia = f.de;
+      return '';
+    }, 'Agenda: montagem apto ' + f.unidade + ' de ' + dm(f.de) + ' a ' + dm(f.ate), '#m-erro', '#dlg-montagem', $('#m-salvar'));
+  }
+  function excluir(btn, grupo, id, dlg, idErro) {
+    if (btn.dataset.passo !== '1') { btn.dataset.passo = '1'; btn.textContent = 'Confirmar exclusão'; return; }
+    gravar(function () { delete D[grupo][id]; return ''; }, 'Agenda: exclusão em ' + grupo + ' (' + id + ')', idErro, dlg, btn);
+  }
+  function salvarConfig(ev) {
+    ev.preventDefault();
+    var f = { haMorador: $('#c-morador').checked, contato: $('#c-contato').value.trim(), ate: $('#c-ate').value };
+    if (!f.ate || f.ate < INICIO) return erro('#c-erro', 'Informe até quando a agenda fica aberta.');
+    gravar(function () { D.config = Object.assign({}, D.config, f); return ''; }, 'Agenda: configurações', '#c-erro', '#dlg-config', $('#c-salvar'));
+  }
+  async function entrar(ev) {
+    ev.preventDefault();
+    var t = $('#l-token').value.trim(), n = $('#l-nome').value.trim(), btn = $('#l-entrar');
+    if (!n) return erro('#l-erro', 'Informe seu nome.');
+    if (!t) return erro('#l-erro', 'Cole a chave de acesso.');
+    btn.disabled = true; ED.token = t;
+    try {
+      D = (await ghLer()).dados;
+      ED.nome = n; ED.ativo = true; guarda.por('liv-agenda-token', t); guarda.por('liv-agenda-nome', n);
+      UI.estado = 'ok'; UI.conferido = new Date(); $('#l-token').value = ''; $('#dlg-entrar').close(); render();
+    } catch (e) {
+      ED.token = ''; ED.ativo = false;
+      erro('#l-erro', e && e.status === 401 ? 'Chave não aceita pelo GitHub. Confira se copiou a chave inteira e se ela não venceu.' : 'Não foi possível conferir a chave agora. Tente de novo.');
+    }
+    btn.disabled = false;
+  }
+
+  /* ---------- eventos ---------- */
+  function ir(dia) {
+    UI.dia = dia; UI.semana = limitarSemana(monday(parse(dia))); UI.mes = limitarMes(dia.slice(0, 7)); render();
+  }
+  $('#btn-ant').addEventListener('click', function () { if (UI.vista === 'semana') UI.semana = limitarSemana(addDays(UI.semana, -7)); else { UI.mes = limitarMes(somaMes(UI.mes, -1)); UI.dia = ''; } render(); });
+  $('#btn-prox').addEventListener('click', function () { if (UI.vista === 'semana') UI.semana = limitarSemana(addDays(UI.semana, 7)); else { UI.mes = limitarMes(somaMes(UI.mes, 1)); UI.dia = ''; } render(); });
+  $('#btn-hoje').addEventListener('click', function () { var h = new Date(), g = h.getDay(); ir(iso(g === 6 ? addDays(h, 2) : g === 0 ? addDays(h, 1) : h)); });
+  $('#f-apto').value = UI.apto;
+  $('#f-apto').addEventListener('input', function () { UI.apto = this.value.replace(/\D/g, ''); guarda.por('liv-agenda-apto', UI.apto); render(); });
+  document.addEventListener('click', function (ev) {
+    var t = ev.target;
+    var f = t.closest('[data-fechar]'); if (f) { f.closest('dialog').close(); return; }
+    var v = t.closest('[data-vista]'); if (v) { UI.vista = v.dataset.vista; guarda.por('liv-agenda-vista', UI.vista); if (UI.vista === 'mes') UI.mes = limitarMes(iso(addDays(UI.semana, 2)).slice(0, 7)); else if (UI.dia) UI.semana = limitarSemana(monday(parse(UI.dia))); render(); return; }
+    if (t.closest('[data-entrar]')) { $('#l-nome').value = ED.nome; erro('#l-erro', ''); $('#dlg-entrar').showModal(); return; }
+    if (t.closest('[data-sair]')) { sair(); render(); return; }
+    var a = t.closest('[data-acao]'); if (!a) return;
+    var k = a.dataset.acao;
+    if (k === 'dia') { UI.dia = a.dataset.dia; if (UI.dia.slice(0, 7) !== UI.mes) UI.mes = limitarMes(UI.dia.slice(0, 7)); render(); var det = $('#detalhe'); if (det && det.scrollIntoView) det.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return; }
+    if (k === 'ir') { ir(a.dataset.dia); return; }
+    if (!ED.ativo) return;
+    if (k === 'nova-entrega') abrirEntrega(null, a.dataset.dia);
+    else if (k === 'editar-entrega') abrirEntrega(a.dataset.id);
+    else if (k === 'nova-montagem') abrirMontagem(null, a.dataset.dia);
+    else if (k === 'editar-montagem') abrirMontagem(a.dataset.id);
+    else if (k === 'config') { $('#c-morador').checked = !!D.config.haMorador; $('#c-contato').value = D.config.contato || ''; $('#c-ate').value = ate(); $('#c-ate').min = INICIO; erro('#c-erro', ''); $('#dlg-config').showModal(); }
+  });
+  $('#form-entrega').addEventListener('submit', salvarEntrega);
+  $('#form-montagem').addEventListener('submit', salvarMontagem);
+  $('#form-config').addEventListener('submit', salvarConfig);
+  $('#form-entrar').addEventListener('submit', entrar);
+  $('#e-excluir').addEventListener('click', function () { excluir(this, 'entregas', edit.entrega, '#dlg-entrega', '#e-erro'); });
+  $('#m-excluir').addEventListener('click', function () { excluir(this, 'montagens', edit.montagem, '#dlg-montagem', '#m-erro'); });
+  $('#m-de').addEventListener('change', function () { var at = $('#m-ate'); if (!at.value || at.value < this.value) at.value = this.value; });
+
+  /* ---------- partida ---------- */
+  ED.ativo = !!ED.token;
+  render();
+  atualizar();
+  setInterval(function () { if (!document.hidden) atualizar(); }, 120000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && (!UI.conferido || Date.now() - UI.conferido.getTime() > 30000)) atualizar(); });
+})();
+</script>
+</body>
+</html>
