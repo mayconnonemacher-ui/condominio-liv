@@ -16,7 +16,7 @@ dem = json.load(open(os.path.join(HERE, "demandas.json"), encoding="utf-8"))  # 
 
 CATS = ["Administração/contabilidade", "Portaria / Zeladoria / Limpeza", "Portaria remota", "Controle de pragas / Caixa d'água",
         "Análise de água (poço)", "Piscineiro", "Jardinagem", "Extintores / incêndio", "Elevadores", "Seguro", "Gás (GLP)", "Manutenção predial",
-        "Box de entregas", "Fechamento de sacadas", "Outros"]
+        "Box de entregas", "Portões da garagem", "Fechamento de sacadas", "Outros"]
 MAP = {1: "Portaria / Zeladoria / Limpeza", 2: "Portaria / Zeladoria / Limpeza", 3: "Análise de água (poço)", 4: "Controle de pragas / Caixa d'água",
        5: "Controle de pragas / Caixa d'água", 6: "Piscineiro", 7: "Portaria remota", 8: "Administração/contabilidade", 9: "Jardinagem",
        10: "Elevadores", 11: "Extintores / incêndio", 12: "Manutenção predial", 13: "Seguro", 14: "Outros", 15: "Box de entregas"}
@@ -355,7 +355,7 @@ footer{{font-size:12px;color:var(--ink-3);margin-top:24px}}
 <p class="intro">Acompanhamento das cotações para contratação dos serviços de conservação e manutenção do condomínio. Para cada serviço estão o escopo pretendido, a base legal, os fornecedores consultados e as propostas recebidas. A regra adotada é obter no mínimo três propostas por serviço antes de levar a decisão à assembleia. Mais abaixo, o orçamento anual projetado e o caixa mínimo necessário antes do início dos contratos, recalculados a cada atualização.</p>
 <div class="kpis">{kpis}</div>
 <div class="two">
-<div class="panel"><h2 style="margin-bottom:10px">Resumo de custos por serviço</h2><div class="tw"><table><thead><tr><th>Serviço</th><th>Propostas</th><th class="n">Menor</th><th class="n c-md">Média</th><th class="n c-md">Maior</th><th class="c-md">Contratado</th></tr></thead><tbody>{cost_rows}</tbody></table></div><p class="muted" style="font-size:12px;margin:10px 0 0">Valores mensais em reais, conforme propostas recebidas. Serviços anuais (seguro, extintores, limpeza de reservatório) são lançados pelo valor mensal equivalente. Fechamento de sacadas: preço por unidade, pago por cada proprietário — aparece na coluna Avulso da seção própria e não entra no custo mensal.</p></div>
+<div class="panel"><h2 style="margin-bottom:10px">Resumo de custos por serviço</h2><div class="tw"><table><thead><tr><th>Serviço</th><th>Propostas</th><th class="n">Menor</th><th class="n c-md">Média</th><th class="n c-md">Maior</th><th class="c-md">Contratado</th></tr></thead><tbody>{cost_rows}</tbody></table></div><p class="muted" style="font-size:12px;margin:10px 0 0">Valores mensais em reais, conforme propostas recebidas. Serviços anuais (seguro, extintores, limpeza de reservatório) são lançados pelo valor mensal equivalente. Fechamento de sacadas: preço por unidade, pago por cada proprietário — aparece na coluna Avulso da seção própria e não entra no custo mensal. Portões da garagem: troca dos 3 portões de enrolar — investimento único (coluna Avulso), fora da taxa mensal; depende de deliberação e de fonte de recursos próprios (rateio extraordinário).</p></div>
 <div class="panel"><h2 style="margin-bottom:10px">Próximas visitas técnicas</h2><ul class="vis">{vis}</ul></div>
 </div>
 {orc_section}
