@@ -105,7 +105,7 @@ if os.path.exists(_pp):
     linhas = []
     by_id = {}
     for ln in PR["linhas"]:
-        ativo = (ln.get("portaria") in (None, portaria))
+        ativo = (ln.get("portaria") in (None, portaria)) and ln.get("ativo", True) is not False  # "ativo": false tira a linha do orçamento sem apagá-la
         origem, valor, impl, quem = "estimativa", None, 0.0, ""
         cands = []
         if ln.get("categoria") and ln.get("campo") and not ln.get("fixado_em"):  # valor fixado em assembleia/conselho não procura propostas
@@ -137,7 +137,11 @@ if os.path.exists(_pp):
         if tipo == "Implantacao": impl, mensal_eq, sched = valor, 0.0, [0.0] * 12
         else:
             mensal_eq = valor / freq
-            sched = [valor if (m >= first and (m - first) % freq == 0) else 0.0 for m in range(1, 13)]
+            npar = max(1, int(ln.get("parcelas", 1)))  # "parcelas": n → cada ocorrência é paga em n parcelas mensais iguais (ex.: seguro anual em 6x sem juros)
+            sched = [0.0] * 12
+            for m0 in range(first, 13, freq):
+                for k in range(npar):
+                    if m0 + k <= 12: sched[m0 + k - 1] += valor / npar
         if not ativo: mensal_eq, sched, impl = 0.0, [0.0] * 12, 0.0
         item = dict(ln, valor=valor, origem=origem, quem=quem, impl=impl, mensal_eq=mensal_eq, sched=sched, ativo=ativo, tipo=tipo, freq=freq)
         linhas.append(item); by_id[ln["id"]] = item
@@ -150,7 +154,9 @@ if os.path.exists(_pp):
     per_m = [sum(l["sched"][m] for l in linhas if l["grupo"] == "provisao") for m in range(12)]  # desembolsos do grupo B por mês de competência
     prest_m = [sum(l["sched"][m] for l in linhas if l["tipo"] == "Prestador") for m in range(12)]
     conc_m = [sum(l["sched"][m] for l in linhas if l["tipo"] == "Concessionaria") for m in range(12)]
-    arrec_nec = desp_mensal / (1 - fr) if fr < 1 else 0
+    fr_sobre_cota = PR.get("fundo_reserva_modo", "sobre_cota") == "sobre_cota"  # True: cota total = ordinária × (1 + fr); False (legado): fr = fração do total arrecadado
+    fr_share = fr / (1 + fr) if fr_sobre_cota else fr  # parcela de cada boleto recebido que vai para o fundo de reserva
+    arrec_nec = desp_mensal * (1 + fr) if fr_sobre_cota else (desp_mensal / (1 - fr) if fr < 1 else 0)
     taxa_nec = arrec_nec / pag if pag else 0
     taxa_fixo = fixo_m / pag if pag else 0; taxa_prov = prov_m / pag if pag else 0; taxa_fr = taxa_nec - taxa_fixo - taxa_prov
     taxa_nec_inad = taxa_nec / PR["cenarios"]["base"]["em_dia"]
@@ -175,7 +181,7 @@ if os.path.exists(_pp):
             rec = b * emd + (bruta * a30 if m - 1 > defas else 0) + (bruta * a60 if m - 2 > defas else 0)
             ent = rec + fi_mes[m] + (aporte_u * unid if m == 1 else 0)
             sai = (impl_total * fat if m == 1 else 0) + (prest_m[m - 2] * fat if m >= 2 else 0) + (conc_m[m - 2] * fat if m >= 2 else 0)
-            saldo += ent - sai; fracum += fr * rec
+            saldo += ent - sai; fracum += fr_share * rec
             meses.append(dict(m=m, data=_add_months(ini, m - 1), ent=ent, fi=fi_mes[m], sai=sai, saldo=saldo, fr=fracum, livre=saldo - fracum))
         # diário 92 dias (recebimentos do fundo anteriores ao início dos serviços entram no dia 1)
         dias = []; s = saldo0; fa = 0.0; worst = (None, 1e18)
@@ -189,7 +195,7 @@ if os.path.exists(_pp):
             sai = (impl_total * fat if i == 0 else 0)
             if mn >= 2 and d.day == dpag: sai += prest_m[mn - 2] * fat
             if mn >= 2 and d.day == dcon: sai += conc_m[mn - 2] * fat
-            s += ent + rec - sai; fa += fr * rec
+            s += ent + rec - sai; fa += fr_share * rec
             livre = s - fa
             if livre < worst[1]: worst = (d, livre)
             dias.append((d, livre))
@@ -259,11 +265,13 @@ if os.path.exists(_pp):
     svg = f'''<svg viewBox="0 0 {W} {H}" role="img" aria-label="Caixa livre projetado ao fim de cada mês, cenários base e pessimista" style="width:100%;height:auto;max-width:100%"><style>.gl{{stroke:var(--line);stroke-width:1}}.zl{{stroke:var(--ink-3);stroke-width:1.2;stroke-dasharray:4 3}}.ax{{font:10px "IBM Plex Mono",monospace;fill:var(--ink-3)}}.lb{{stroke:var(--accent);stroke-width:2.5;fill:none}}.lp{{stroke:var(--warn);stroke-width:2.5;fill:none;stroke-dasharray:6 4}}</style>{grid}{zero}{ticks}<path d="{path('base')}" class="lb"/><path d="{path('pessimista')}" class="lp"/></svg>'''
     cb, cp = CAP["base"], CAP["pessimista"]
     folga = PR["taxa_construtora"] - taxa_nec
+    CA = PR.get("cota_aprovada")  # {"ordinaria", "fundo_reserva", "total"} fixada em assembleia
     cen_b, cen_p = PR["cenarios"]["base"], PR["cenarios"]["pessimista"]
     orc_kpis = kpi("Custos fixos mensais", brl(fixo_m), f"{brl(taxa_fixo)}/unidade · {len([l for l in linhas if l['ativo'] and l['grupo']=='fixo'])} itens") + \
         kpi("Provisões mensais", brl(prov_m), f"{brl(taxa_prov)}/unidade · {len([l for l in linhas if l['ativo'] and l['grupo']=='provisao'])} itens periódicos/legais") + \
         kpi("Taxa mensal por unidade", brl(taxa_nec), f"fixos {brl(taxa_fixo)} + provisões {brl(taxa_prov)} + fundo de reserva {brl(taxa_fr)}") + \
-        kpi("Estimativa da construtora", brl(PR["taxa_construtora"]), (f"folga de {brl(folga)}/unidade" if folga >= 0 else f"faltam {brl(-folga)}/unidade"), True) + \
+        (kpi("Cota aprovada (AGE 25/09)", brl(CA["total"]), (f"sobra de {brl(CA['total'] - taxa_nec)}/unidade sobre a necessária" if CA["total"] >= taxa_nec else f"faltam {brl(taxa_nec - CA['total'])}/unidade para a necessária"), True) if CA else
+         kpi("Estimativa da construtora", brl(PR["taxa_construtora"]), (f"folga de {brl(folga)}/unidade" if folga >= 0 else f"faltam {brl(-folga)}/unidade"), True)) + \
         kpi("Implantação — cota única", brl(impl_total), f"{brl(impl_total/unid if unid else 0)}/unidade · fora da taxa mensal") + \
         (kpi("Fundo de instalação aprovado", brl(fi_total), f"{brl(fi_u)}/unidade em {len(fi_parc)}× (AGE 02/09) · necessidade calculada {brl(cp['recomendado'])}")
          if fi_total else kpi("Caixa mínimo inicial", brl(cp["recomendado"]), f"cenário pessimista · {brl(cb['recomendado'])} no base"))
@@ -293,7 +301,7 @@ if os.path.exists(_pp):
         fundo += prov_m - (per_m[k - 1] if k >= 1 else 0)
         mtr += f'<tr><td>{MESN[x["data"].month-1]}/{str(x["data"].year)[2:]}</td><td class="n c-md">{brl(x["ent"])}</td><td class="n">{brl(fixo_m)}</td><td class="n">{brl(per_m[k-1]) if k >= 1 else "—"}</td><td class="n c-md">{brl(prov_m)}</td><td class="n">{brl(fundo).replace("R$ -", "−R$ ")}</td><td class="n">{brl(x["livre"]).replace("R$ -", "−R$ ")}</td></tr>'
     orc_section = f'''<section class="panel" id="orcamento"><h2 style="margin-bottom:6px">Orçamento anual e caixa mínimo inicial</h2>
-<p class="muted" style="font-size:13px;margin:0 0 12px">A taxa mensal é formada por três parcelas: <strong>A — custos fixos</strong> (serviços contínuos, pagos todo mês), <strong>B — provisões</strong> (despesas trimestrais, semestrais ou anuais, muitas exigidas por lei, rateadas em parcelas mensais iguais e acumuladas num fundo até o desembolso) e o <strong>fundo de reserva</strong> ({fr*100:.0f}%). Gastos de implantação, que ocorrem uma única vez, ficam fora da taxa e são cobertos por uma cota única. Para cada serviço vale o valor contratado, senão a menor proposta recebida, senão uma estimativa de mercado (marcada como tal). Rateio igual entre {unid} unidades; início dos serviços em {ini.strftime("%d/%m/%Y")}; portaria {portaria.lower()}.{fi_txt}</p>
+<p class="muted" style="font-size:13px;margin:0 0 12px">A taxa mensal é formada por três parcelas: <strong>A — custos fixos</strong> (serviços contínuos, pagos todo mês), <strong>B — provisões</strong> (despesas trimestrais, semestrais ou anuais, muitas exigidas por lei, rateadas em parcelas mensais iguais e acumuladas num fundo até o desembolso) e o <strong>fundo de reserva</strong> ({fr*100:.0f}%{" sobre a cota ordinária, cobrado em acréscimo" if fr_sobre_cota else ""}). Gastos de implantação, que ocorrem uma única vez, ficam fora da taxa e são cobertos por uma cota única. Para cada serviço vale o valor contratado, senão a menor proposta recebida, senão uma estimativa de mercado (marcada como tal). Rateio igual entre {unid} unidades; início dos serviços em {ini.strftime("%d/%m/%Y")}; portaria {portaria.lower()}.{fi_txt}</p>
 <div class="kpis">{orc_kpis}</div>
 <div class="two">
 <div><h2 style="font-size:14px;margin:0 0 6px">Caixa livre ao fim de cada mês</h2>
@@ -309,7 +317,7 @@ if os.path.exists(_pp):
 <p class="muted" style="font-size:12px;margin:0 0 8px">Os fixos saem todo mês; os periódicos saem só quando vencem e são pagos com o fundo de provisões, alimentado por {brl(prov_m)} por mês. Fundo negativo nos primeiros meses indica despesa periódica que vence antes de a provisão estar formada — é o que o fundo inicial de instalação cobre. A coluna Entradas inclui os boletos e, quando houver, as parcelas do fundo de instalação recebidas no mês. Fixos e periódicos por mês de competência (o pagamento cai no dia {dpag} do mês seguinte); caixa livre pelo calendário real, já sem o fundo de reserva.</p>
 <div class="tw"><table><thead><tr><th>Mês</th><th class="n c-md">Entradas</th><th class="n">Fixos (A)</th><th class="n">Periódicos pagos (B)</th><th class="n c-md">Provisão do mês</th><th class="n">Fundo de provisões</th><th class="n">Caixa livre</th></tr></thead><tbody>{mtr}</tbody></table></div>
 <details style="margin-top:12px"><summary class="muted" style="cursor:pointer;font-size:13px">Premissas e método</summary>
-<p class="muted" style="font-size:12px">Boletos vencem no dia {venc}; prestadores são pagos no dia {dpag} do mês seguinte à competência e concessionárias no dia {dcon}. Atrasos de 30 e 60 dias são recebidos nos vencimentos seguintes. O fundo de reserva ({fr*100:.0f}% do recebido) fica segregado e não conta como caixa livre. Taxa mensal = (custos fixos + provisões mensais) ÷ (1 − fundo de reserva) ÷ unidades pagantes; a provisão mensal de cada item periódico = valor da ocorrência ÷ meses entre ocorrências, de modo que nenhuma despesa anual ou semestral entra na taxa pelo valor cheio. Fixos e periódicos são pagos nas datas em que realmente ocorrem (o fluxo de caixa usa o calendário real, não a média). Necessidade de caixa mínimo = o que faltaria para o caixa livre não ficar negativo no pior dia dos 90 primeiros dias SEM o fundo de instalação (já incluindo a implantação) + reserva de segurança; ela é comparada com o fundo inicial de instalação aprovado na AGE de 02/09/2026 (item 6). As parcelas do fundo entram no caixa nas datas de vencimento com o mesmo perfil de recebimento dos boletos de cada cenário; a parcela anterior ao início dos serviços é considerada disponível no dia 1. O fundo permanente de manutenção/obras foi rejeitado na mesma assembleia (item 8) e não entra na taxa. Estimativas de mercado (Cascavel, set/2026) não são propostas e são substituídas automaticamente quando uma proposta é lançada no painel. Itens sem categoria no painel (energia, tarifas, material) permanecem estimados até a primeira fatura.</p></details>
+<p class="muted" style="font-size:12px">Boletos vencem no dia {venc}; prestadores são pagos no dia {dpag} do mês seguinte à competência e concessionárias no dia {dcon}. Atrasos de 30 e 60 dias são recebidos nos vencimentos seguintes. O fundo de reserva ({fr*100:.0f}% {"sobre a cota ordinária, ou seja " + f"{fr_share*100:.2f}".replace(".", ",") + "% de cada boleto recebido" if fr_sobre_cota else "do recebido"}) fica segregado e não conta como caixa livre. Taxa mensal = (custos fixos + provisões mensais) {"× (1 + fundo de reserva)" if fr_sobre_cota else "÷ (1 − fundo de reserva)"} ÷ unidades pagantes; a cota cobrada no fluxo de caixa é a taxa adotada nas premissas ({brl(taxa)}/unidade); itens anuais pagos em parcelas (ex.: seguro) saem do caixa nos meses das parcelas, mas entram na taxa pelo valor anual ÷ 12; a provisão mensal de cada item periódico = valor da ocorrência ÷ meses entre ocorrências, de modo que nenhuma despesa anual ou semestral entra na taxa pelo valor cheio. Fixos e periódicos são pagos nas datas em que realmente ocorrem (o fluxo de caixa usa o calendário real, não a média). Necessidade de caixa mínimo = o que faltaria para o caixa livre não ficar negativo no pior dia dos 90 primeiros dias SEM o fundo de instalação (já incluindo a implantação) + reserva de segurança; ela é comparada com o fundo inicial de instalação aprovado na AGE de 02/09/2026 (item 6). As parcelas do fundo entram no caixa nas datas de vencimento com o mesmo perfil de recebimento dos boletos de cada cenário; a parcela anterior ao início dos serviços é considerada disponível no dia 1. O fundo permanente de manutenção/obras foi rejeitado na mesma assembleia (item 8) e não entra na taxa. Estimativas de mercado (Cascavel, set/2026) não são propostas e são substituídas automaticamente quando uma proposta é lançada no painel. Itens sem categoria no painel (energia, tarifas, material) permanecem estimados até a primeira fatura.</p></details>
 </section>'''
 
 page = f'''<title>Cotações LIV — Conselho</title>

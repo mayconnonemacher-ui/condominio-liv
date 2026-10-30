@@ -1,10 +1,10 @@
 {
-  "_comentario": "Premissas do orçamento, fluxo de caixa e capital de giro exibidos na página do conselho. Edite aqui e faça upload no GitHub; a rotina de publicação recalcula tudo. Valores em R$; percentuais em fração (0.10 = 10%). FORA DO ORÇAMENTO por decisão do síndico (18/09/2026): gás/GLP — fornecimento e cobrança individual por unidade, direto pela distribuidora, sem cotação pelo condomínio; manutenção de elevadores (mensal e RIA/ART) — fica com a fabricante do equipamento para não perder a garantia; manutenção elétrica/hidráulica/predial e laudo do SPDA — sem previsão de levantamento de demanda/orçamento. As linhas 'elevadores', 'elev_ria', 'predial' e 'spda' foram removidas; reincluir aqui se a decisão mudar. 25/09/2026 (manhã da AGE): série mensal de caixa, necessidade de caixa mínimo e folga do fundo de instalação RECALCULADAS com gen_conselho.py sobre este arquivo e o banco do painel (55 fornecedores), incluindo a decisão do Conselho de 24/09 (Atlanta portaria remota R$ 5.500 e zeladoria R$ 21.300) e a 2ª proposta de piscina (Edson, R$ 800). 28/09/2026: propostas revisadas do Grupo Atlanta (escolhido na AGE de 25/09) — portaria remota R$ 5.500 → R$ 5.000/mês e zeladoria (3 postos) R$ 21.300 → R$ 18.300/mês; orçamento, taxa, série de caixa, necessidade de caixa mínimo e folga do fundo recalculados com gen_conselho.py sobre este arquivo e o banco do painel. 06/10/2026: 1ª proposta de jardinagem e paisagismo lançada no painel (Mendes Jardinagem, orçamento OR.0004, R$ 1.500/mês, 2 visitas por mês) — substitui a estimativa de R$ 900/mês da linha 'jardim' (+R$ 600/mês); orçamento, taxa, série de caixa, necessidade de caixa mínimo e folga do fundo recalculados com gen_conselho.py sobre este arquivo e o banco do painel (56 fornecedores). 07/10/2026: piscina CONTRATADA (Tratamento Piscinas Edson, R$ 800/mês — status Contratado no painel; o Anderson reenviou proposta a R$ 700 em 05/10, registrada sem alterar a linha); nova categoria 'Portões da garagem' no painel e no gen_conselho.py com 3 propostas de troca dos 3 portões de enrolar (Tecnoportas R$ 104.960 · Metal Laran R$ 115.605, ou R$ 95.505 à vista · Hi.flo R$ 153.579) — investimento único, FORA da taxa mensal e deste orçamento; sem linha aqui até a assembleia deliberar a obra e a fonte de recursos (rateio extraordinário).",
+  "_comentario": "Premissas do orçamento, fluxo de caixa e capital de giro exibidos na página do conselho. Edite aqui e faça upload no GitHub; a rotina de publicação recalcula tudo. Valores em R$; percentuais em fração (0.10 = 10%). FORA DO ORÇAMENTO por decisão do síndico (18/09/2026): gás/GLP — fornecimento e cobrança individual por unidade, direto pela distribuidora, sem cotação pelo condomínio; manutenção de elevadores (mensal e RIA/ART) — fica com a fabricante do equipamento para não perder a garantia; manutenção elétrica/hidráulica/predial e laudo do SPDA — sem previsão de levantamento de demanda/orçamento. As linhas 'elevadores', 'elev_ria', 'predial' e 'spda' foram removidas; reincluir aqui se a decisão mudar. 25/09/2026 (manhã da AGE): série mensal de caixa, necessidade de caixa mínimo e folga do fundo de instalação RECALCULADAS com gen_conselho.py sobre este arquivo e o banco do painel (55 fornecedores), incluindo a decisão do Conselho de 24/09 (Atlanta portaria remota R$ 5.500 e zeladoria R$ 21.300) e a 2ª proposta de piscina (Edson, R$ 800). 28/09/2026: propostas revisadas do Grupo Atlanta (escolhido na AGE de 25/09) — portaria remota R$ 5.500 → R$ 5.000/mês e zeladoria (3 postos) R$ 21.300 → R$ 18.300/mês; orçamento, taxa, série de caixa, necessidade de caixa mínimo e folga do fundo recalculados com gen_conselho.py sobre este arquivo e o banco do painel. 06/10/2026: 1ª proposta de jardinagem e paisagismo lançada no painel (Mendes Jardinagem, orçamento OR.0004, R$ 1.500/mês, 2 visitas por mês) — substitui a estimativa de R$ 900/mês da linha 'jardim' (+R$ 600/mês); orçamento, taxa, série de caixa, necessidade de caixa mínimo e folga do fundo recalculados com gen_conselho.py sobre este arquivo e o banco do painel (56 fornecedores). 07/10/2026: piscina CONTRATADA (Tratamento Piscinas Edson, R$ 800/mês — status Contratado no painel; o Anderson reenviou proposta a R$ 700 em 05/10, registrada sem alterar a linha); nova categoria 'Portões da garagem' no painel e no gen_conselho.py com 3 propostas de troca dos 3 portões de enrolar (Tecnoportas R$ 104.960 · Metal Laran R$ 115.605, ou R$ 95.505 à vista · Hi.flo R$ 153.579) — investimento único, FORA da taxa mensal e deste orçamento; sem linha aqui até a assembleia deliberar a obra e a fonte de recursos (rateio extraordinário). 30/10/2026: (1) SEGURO — cotação Tokio Marine nº 1085302176 via VJOMM (29/10/2026, validade 05/11), já no CNPJ do condomínio, lançada no painel: cenário recomendado LMI R$ 160 mi + assistência básica, R$ 27.998,16/ano em 6x sem juros (alternativa LMI R$ 100 mi, R$ 24.088,36); a linha 'seguro' passa a ser anual (freq 12, 1ª em nov/26) paga em 6 parcelas e entra na taxa pelo valor anual ÷ 12 — substitui a Allianz (R$ 44.547,19, vencida em 16/10). (2) LIMPVEL — contrato recebido em 27/10/2026 com os valores aprovados (R$ 450/mês + R$ 1.900 por limpeza semestral), vigência a partir de 10/11/2026: 'agua_poco' e 'reservatorios' começam no mês 2 (nov/26). (3) BOX DE ENTREGAS fora do orçamento ('ativo': false) — o síndico informou em 28/10 que o armário inteligente ainda não existe e é opção futura. (4) FUNDO DE RESERVA calculado SOBRE a cota ordinária (ata 02/09, item 7; cota aprovada R$ 1.504,00 + 10% = R$ 1.654,40) — 'fundo_reserva_modo': 'sobre_cota'; antes o modelo tratava os 10% como fração do total (÷ 0,9), o que superestimava a taxa em ≈ 1%. (5) 'taxa_adotada' = cota aprovada R$ 1.654,40 (o que de fato é cobrado), e 1º boleto ordinário em 10/11/2026 (cenário base) — outubro coberto pelo fundo de instalação; pessimista com 1º boleto em 10/12.",
   "unidades": 32,
   "unidades_isentas": 0,
   "taxa_construtora": 1200,
-  "taxa_adotada": 1551,
-  "_taxa_adotada_obs": "Taxa necessária calculada a partir do orçamento das propostas recebidas (item 5 da pauta da AGE de 25/09/2026) — substitui a referência de R$ 1.200 da construtora para fins de projeção de fluxo de caixa. Histórico: R$ 1.654 (5ª atualização, 16/09) → R$ 1.644 (6ª, 18/09, 1ª proposta de piscina a R$ 850) → R$ 1.543 (7ª, 18/09, retirada de elevadores, RIA, manutenção predial e SPDA do orçamento; mantida na 8ª, 23/09) → R$ 1.670 (24/09, manhã: Conselho recomendou contratar Atlanta para portaria remota, R$ 5.980, e zeladoria com 3 postos, R$ 21.300) → R$ 1.654 (24/09, tarde: Atlanta ajustou a portaria remota para R$ 5.500/mês) → R$ 1.652 (25/09, manhã: 2ª proposta de piscina, Tratamento Piscinas Edson, R$ 800/mês, R$ 50 abaixo do Anderson) → R$ 1.530 (28/09: propostas revisadas do Grupo Atlanta, escolhido na AGE de 25/09 — portaria remota R$ 5.000 e zeladoria 3 postos R$ 18.300). → R$ 1.551 (06/10: 1ª proposta de jardinagem e paisagismo, Mendes Jardinagem, R$ 1.500/mês, no lugar da estimativa de R$ 900). 07/10: piscina CONTRATADA com o Edson a R$ 800 (valor já usado desde 25/09; a proposta posterior do Anderson a R$ 700 não altera a linha) — taxa mantida em R$ 1.551. Ajuste aqui se a assembleia fixar valor diferente.",
+  "taxa_adotada": 1654.4,
+  "_taxa_adotada_obs": "30/10/2026: passa a ser a COTA APROVADA na AGE de 25/09/2026 (R$ 1.504,00 + 10% de fundo de reserva = R$ 1.654,40/unidade), que é o valor efetivamente cobrado — o fluxo de caixa reflete a arrecadação real e a página compara essa cota com a taxa necessária recalculada. Taxa necessária calculada a partir do orçamento das propostas recebidas (item 5 da pauta da AGE de 25/09/2026) — substitui a referência de R$ 1.200 da construtora para fins de projeção de fluxo de caixa. Histórico: R$ 1.654 (5ª atualização, 16/09) → R$ 1.644 (6ª, 18/09, 1ª proposta de piscina a R$ 850) → R$ 1.543 (7ª, 18/09, retirada de elevadores, RIA, manutenção predial e SPDA do orçamento; mantida na 8ª, 23/09) → R$ 1.670 (24/09, manhã: Conselho recomendou contratar Atlanta para portaria remota, R$ 5.980, e zeladoria com 3 postos, R$ 21.300) → R$ 1.654 (24/09, tarde: Atlanta ajustou a portaria remota para R$ 5.500/mês) → R$ 1.652 (25/09, manhã: 2ª proposta de piscina, Tratamento Piscinas Edson, R$ 800/mês, R$ 50 abaixo do Anderson) → R$ 1.530 (28/09: propostas revisadas do Grupo Atlanta, escolhido na AGE de 25/09 — portaria remota R$ 5.000 e zeladoria 3 postos R$ 18.300). → R$ 1.551 (06/10: 1ª proposta de jardinagem e paisagismo, Mendes Jardinagem, R$ 1.500/mês, no lugar da estimativa de R$ 900). 07/10: piscina CONTRATADA com o Edson a R$ 800 (valor já usado desde 25/09; a proposta posterior do Anderson a R$ 700 não altera a linha) — taxa mantida em R$ 1.551. Ajuste aqui se a assembleia fixar valor diferente.",
   "fundo_reserva": 0.1,
   "inicio_servicos": "2026-10-01",
   "dia_vencimento_boleto": 10,
@@ -36,14 +36,14 @@
       "em_dia": 0.88,
       "atraso30": 0.08,
       "atraso60": 0.04,
-      "defasagem_boleto": 0,
+      "defasagem_boleto": 1,
       "fator_despesa": 1.0
     },
     "pessimista": {
       "em_dia": 0.75,
       "atraso30": 0.15,
       "atraso60": 0.1,
-      "defasagem_boleto": 1,
+      "defasagem_boleto": 2,
       "fator_despesa": 1.1
     }
   },
@@ -87,10 +87,10 @@
       "est_min": 400,
       "est_max": 600,
       "freq": 1,
-      "primeira": 1,
+      "primeira": 2,
       "implantacao_campo": "valorAvulso",
       "implantacao_est": 800,
-      "fonte": "Duas propostas: Limpvel R$ 450/mês + R$ 810 (fotômetro + reagente) e Braságua R$ 600/mês + R$ 1.200 de implantação (orçamento 60/2026, 15/09/2026). Vale a menor (Limpvel) — confirmado pelo Conselho Fiscal e Consultivo em 24/09/2026 junto com as demais recomendações de contratação."
+      "fonte": "CONTRATO recebido em 27/10/2026 (Limpvel — Marco A. Baravelli & Cia, assinado digitalmente pela contratada): R$ 450/mês (Cl. 7ª §1), vigência a partir de 10/11/2026, prazo mínimo 12 meses, reajuste anual IPCA, pagamento até o dia 15 do mês seguinte — valores iguais aos aprovados na AGE de 25/09. Pendências antes de o condomínio assinar: CNPJ errado no contrato (58.531.355/0001-97 → 69.578.099/0001-00), ART/RT, teste diário de cloro pela zeladoria. Implantação R$ 810 (fotômetro + reagente) comprada à parte (§8). 1ª competência nov/26. Outra proposta: Braságua R$ 600/mês + R$ 1.200."
     },
     {
       "id": "pragas",
@@ -119,8 +119,8 @@
       "est_min": 1600,
       "est_max": 2400,
       "freq": 6,
-      "primeira": 1,
-      "fonte": "Proposta Limpvel: R$ 1.900 por execução (2 cisternas + 4 reservatórios elevados) — confirmada pelo Conselho Fiscal e Consultivo em 24/09/2026."
+      "primeira": 2,
+      "fonte": "CONTRATO Limpvel (27/10/2026), Cl. 7ª §2: R$ 1.900 por limpeza e desinfecção (2 cisternas + 4 reservatórios elevados de 15 m³), semestral. O contrato traz '1ª execução em maio de 2026' (erro) — modelo assume a 1ª em nov/26, antes da ocupação, e a 2ª em mai/27."
     },
     {
       "id": "piscina",
@@ -247,15 +247,16 @@
     },
     {
       "id": "seguro",
-      "nome": "Seguro do condomínio — apólice anual parcelada em 12x",
+      "nome": "Seguro do condomínio — apólice anual (art. 1.346 CC), paga em 6x sem juros",
       "categoria": "Seguro",
-      "campo": "valorMensal",
+      "campo": "valorAvulso",
       "tipo": "Prestador",
-      "est_min": 500,
-      "est_max": 1000,
-      "freq": 1,
-      "primeira": 1,
-      "fonte": "Cotação prévia Allianz nº 504600758 via VJOMM Corretora (16/09/2026, válida até 16/10): prêmio total R$ 44.547,19/ano (líquido R$ 41.485,55 + IOF), LMG R$ 50 milhões, modalidade Ampla, indenização a valor de novo, RC portões/condomínio/síndico — lançada no painel como R$ 3.712/mês (÷12). Emitida em nome da construtora (Dabol) porque o condomínio ainda não tem CNPJ; cadastro com 3 elevadores e 2 blocos (o LIV tem 2 elevadores e 1 torre) — corrigir antes de contratar. A estimativa original (R$ 500–1.000/mês) ficou muito abaixo; buscar mais 2 cotações (Porto, Tokio Marine, Mapfre) assim que o CNPJ sair."
+      "est_min": 24088.36,
+      "est_max": 29322.16,
+      "freq": 12,
+      "primeira": 2,
+      "fonte": "Menor proposta da categoria: Tokio Marine Condomínio via VJOMM (cotação nº 1085302176, 29/10/2026, validade 05/11/2026), no CNPJ 69.578.099/0001-00. Cenário lançado (recomendado): Básica Ampla LMI R$ 160 mi, RC síndico e RC condomínio R$ 2 mi cada, RC portões R$ 500 mil, assistência 24h básica — R$ 27.998,16/ano com IOF, 1ª parcela à vista + 5 sem juros (até 6x). Alternativas da mesma cotação: LMI R$ 100 mi R$ 24.088,36 (básica) / R$ 25.412,36 (completa); LMI R$ 160 mi com assistência completa R$ 29.322,16. Teto autorizado na AGE de 25/09: R$ 44.547,19/ano (Allianz, cotação vencida em 16/10). Entra na taxa por 1/12 do prêmio (provisão) e sai do caixa em 6 parcelas a partir de nov/26. Pendentes: 3ª cotação (Porto/Mapfre), definição do LMI pelo custo de reconstrução e ajuste da vigência para a data de emissão.",
+      "parcelas": 6
     },
     {
       "id": "box_entregas",
@@ -267,7 +268,8 @@
       "est_max": 0,
       "freq": 1,
       "primeira": 1,
-      "fonte": "Duas propostas em mãos, serviço ainda opcional (só entra na taxa se a assembleia aprovar): (1) V Express, recebida 14/09/2026, R$ 650,00/mês, contrato de 24 meses, 30 dias de teste grátis; (2) Grupo Atlanta ('Armários Inteligentes'), recebida 16/09/2026, R$ 650,00/mês (mensalidade do sistema de gestão) por 1 módulo central de 10 portas (cobre até ~70 unidades, expansível por módulos adicionais), contrato de locação de 36 meses. Mesmo valor mensal; diferença está no prazo de contrato e na capacidade/expansão do equipamento. Não fez parte da recomendação de contratação do Conselho em 24/09/2026 (fica 'a definir'); segue entrando no orçamento pelo empate de preço entre as duas propostas até a assembleia decidir."
+      "fonte": "FORA DO ORÇAMENTO desde 30/10/2026 ('ativo': false): o síndico informou em 28/10/2026 que o armário inteligente de entregas ainda não existe e é uma opção futura. Propostas guardadas no painel: V Express R$ 650/mês (24 meses) e Grupo Atlanta R$ 650/mês (36 meses). Para reincluir, remover 'ativo': false.",
+      "ativo": false
     },
     {
       "id": "residuos",
@@ -347,5 +349,13 @@
       "primeira": 1,
       "fonte": "Desembolso único no início. A Rigoni oferece a abertura do CNPJ e o auxílio na conta bancária como bônus; a estimativa cobre cartório/registros."
     }
-  ]
+  ],
+  "fundo_reserva_modo": "sobre_cota",
+  "cota_aprovada": {
+    "ordinaria": 1504.0,
+    "fundo_reserva": 150.4,
+    "total": 1654.4,
+    "fonte": "AGE de 25/09/2026, item 5 — cota ordinária R$ 1.504,00 + fundo de reserva de 10% (R$ 150,40) = R$ 1.654,40/unidade; orçamento anual aprovado R$ 571.512"
+  },
+  "_cenarios_obs": "30/10/2026: 1º boleto ordinário em 10/11/2026 no cenário base (defasagem 1) e em 10/12/2026 no pessimista (defasagem 2); em out/2026 só entrou o fundo de instalação (2ª parcela em 20/10). Ajustar se a cota de outubro tiver sido cobrada."
 }
