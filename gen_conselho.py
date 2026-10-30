@@ -25,6 +25,7 @@ PUB = {"A contatar": "Contato pendente", "Contatado": "Em contato", "Visita agen
        "Orçamento recebido": "Proposta recebida", "Contratado": "Contratado", "Descartado": "Descartado"}
 e = html.escape
 def brl(v): return "—" if v in (None, "", 0) else "R$ " + f"{float(v):,.0f}".replace(",", ".")
+def brl2(v): return "—" if v in (None, "", 0) else "R$ " + f"{float(v):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 def brd(iso): return f"{iso[8:10]}/{iso[5:7]}/{iso[:4]}" if iso else "—"
 sidx = lambda s: max(0, STATUS.index(s) if s in STATUS else 0)
 today = datetime.date.today()
@@ -160,6 +161,20 @@ if os.path.exists(_pp):
     taxa_nec = arrec_nec / pag if pag else 0
     taxa_fixo = fixo_m / pag if pag else 0; taxa_prov = prov_m / pag if pag else 0; taxa_fr = taxa_nec - taxa_fixo - taxa_prov
     taxa_nec_inad = taxa_nec / PR["cenarios"]["base"]["em_dia"]
+    # ---- rateios extraordinários (obras aprovadas em assembleia, cobradas à parte da cota ordinária e sem fundo de reserva)
+    RX = []
+    for rx in PR.get("rateios_extras", []):
+        if rx.get("ativo", True) is False: continue
+        cob = [float(v) for v in rx["cobranca_por_unidade"]]
+        m0 = (datetime.date.fromisoformat(rx["primeiro_vencimento"]).year - ini.year) * 12 + datetime.date.fromisoformat(rx["primeiro_vencimento"]).month - ini.month + 1
+        pg = [(datetime.date.fromisoformat(d), float(v)) for d, v in rx["pagamentos"]]
+        RX.append(dict(rx, cob=cob, m0=m0, pg=pg, total_cob=sum(cob) * unid, total_pg=sum(v for _, v in pg)))
+    def _rx_bill(defas):  # valor faturado (todas as unidades) por mês nº, deslocado se o cenário atrasa o 1º boleto
+        b = {}
+        for r in RX:
+            st = max(r["m0"], defas + 1)
+            for k, v in enumerate(r["cob"]): b[st + k] = b.get(st + k, 0.0) + v * unid
+        return b
     # ---- fluxo mensal e diário por cenário
     def cenario(cn, com_fundo=True):
         c = PR["cenarios"][cn]; emd, a30, a60, defas, fat = c["em_dia"], c["atraso30"], c["atraso60"], int(c["defasagem_boleto"]), float(c["fator_despesa"])
@@ -174,15 +189,22 @@ if os.path.exists(_pp):
         for d, v in fi_ev:
             k = max(1, _mn(d))
             if k <= 12: fi_mes[k] += v
+        rxb = _rx_bill(defas)
+        def _mn0(d): return (d.year - ini.year) * 12 + d.month - ini.month + 1
+        rx_pg_mes = {}
+        for r in RX:
+            for d, v in r["pg"]: rx_pg_mes[_mn0(d)] = rx_pg_mes.get(_mn0(d), 0.0) + v
         meses = []
         saldo, fracum = saldo0, 0.0
         for m in range(1, 13):
             b = bruta if m > defas else 0.0
             rec = b * emd + (bruta * a30 if m - 1 > defas else 0) + (bruta * a60 if m - 2 > defas else 0)
-            ent = rec + fi_mes[m] + (aporte_u * unid if m == 1 else 0)
-            sai = (impl_total * fat if m == 1 else 0) + (prest_m[m - 2] * fat if m >= 2 else 0) + (conc_m[m - 2] * fat if m >= 2 else 0)
+            rx_rec = rxb.get(m, 0) * emd + rxb.get(m - 1, 0) * a30 + rxb.get(m - 2, 0) * a60
+            rx_pg = rx_pg_mes.get(m, 0.0)
+            ent = rec + fi_mes[m] + (aporte_u * unid if m == 1 else 0) + rx_rec
+            sai = (impl_total * fat if m == 1 else 0) + (prest_m[m - 2] * fat if m >= 2 else 0) + (conc_m[m - 2] * fat if m >= 2 else 0) + rx_pg
             saldo += ent - sai; fracum += fr_share * rec
-            meses.append(dict(m=m, data=_add_months(ini, m - 1), ent=ent, fi=fi_mes[m], sai=sai, saldo=saldo, fr=fracum, livre=saldo - fracum))
+            meses.append(dict(m=m, data=_add_months(ini, m - 1), ent=ent, fi=fi_mes[m], sai=sai, saldo=saldo, fr=fracum, livre=saldo - fracum, rx_fat=rxb.get(m, 0.0), rx_rec=rx_rec, rx_pg=rx_pg))
         # diário 92 dias (recebimentos do fundo anteriores ao início dos serviços entram no dia 1)
         dias = []; s = saldo0; fa = 0.0; worst = (None, 1e18)
         for i in range(92):
@@ -190,12 +212,14 @@ if os.path.exists(_pp):
             mn = _mn(d)
             ent = (aporte_u * unid if i == 0 else 0) + sum(v for dd, v in fi_ev if dd == d or (i == 0 and dd < ini))
             rec = 0.0
+            rxr = 0.0
             if d.day == venc:
                 rec = (bruta * emd if mn > defas else 0) + (bruta * a30 if mn - 1 > defas else 0) + (bruta * a60 if mn - 2 > defas else 0)
-            sai = (impl_total * fat if i == 0 else 0)
+                rxr = rxb.get(mn, 0) * emd + rxb.get(mn - 1, 0) * a30 + rxb.get(mn - 2, 0) * a60
+            sai = (impl_total * fat if i == 0 else 0) + sum(v for r in RX for dd, v in r["pg"] if dd == d)
             if mn >= 2 and d.day == dpag: sai += prest_m[mn - 2] * fat
             if mn >= 2 and d.day == dcon: sai += conc_m[mn - 2] * fat
-            s += ent + rec - sai; fa += fr_share * rec
+            s += ent + rec + rxr - sai; fa += fr_share * rec
             livre = s - fa
             if livre < worst[1]: worst = (d, livre)
             dias.append((d, livre))
@@ -214,7 +238,7 @@ if os.path.exists(_pp):
     if os.environ.get("LIV_DUMP"):
         json.dump(dict(taxa_nec=taxa_nec, desp_mensal=desp_mensal, fixo_m=fixo_m, prov_m=prov_m, impl_total=impl_total, taxa_fixo=taxa_fixo, taxa_prov=taxa_prov, taxa_fr=taxa_fr,
                        CAP={k: {kk: (vv.isoformat() if hasattr(vv, "isoformat") else vv) for kk, vv in v.items()} for k, v in CAP.items()},
-                       meses={k: [dict(data=x["data"].isoformat(), ent=x["ent"], sai=x["sai"], livre=x["livre"]) for x in v["meses"]] for k, v in CEN.items()},
+                       meses={k: [dict(data=x["data"].isoformat(), ent=x["ent"], sai=x["sai"], livre=x["livre"], rx_fat=x["rx_fat"], rx_rec=x["rx_rec"], rx_pg=x["rx_pg"]) for x in v["meses"]] for k, v in CEN.items()},
                        linhas=[dict(id=l["id"], nome=l["nome"], origem=l["origem"], quem=l["quem"], valor=l["valor"], mensal_eq=l["mensal_eq"], impl=l["impl"], grupo=l["grupo"], ativo=l["ativo"]) for l in linhas]),
                   open(os.environ["LIV_DUMP"], "w"), ensure_ascii=False, indent=1, default=str)
     # ---- render
@@ -296,6 +320,17 @@ if os.path.exists(_pp):
             r += f'<tr><td>Cota única de implantação por unidade</td><td class="n">{brl(cb["aporte"])}</td><td class="n">{brl(cp["aporte"])}</td></tr>'
         return r
     # tabela mensal: fixos, periódicos e fundo de provisões (cenário base)
+    rx_html = ""
+    for r in RX:
+        acum = 0.0; rtr = ""
+        for x in CEN["base"]["meses"]:
+            if not (x["rx_fat"] or x["rx_rec"] or x["rx_pg"]): continue
+            acum += x["rx_rec"] - x["rx_pg"]
+            rtr += f'<tr><td>{MESN[x["data"].month-1]}/{str(x["data"].year)[2:]}</td><td class="n">{brl2(x["rx_fat"]/unid) if x["rx_fat"] else "—"}</td><td class="n c-md">{brl(x["rx_fat"])}</td><td class="n">{brl(x["rx_rec"])}</td><td class="n">{brl(x["rx_pg"])}</td><td class="n">{brl(acum).replace("R$ -", "−R$ ")}</td></tr>'
+        fora = [d for d, _ in r["pg"] if (d.year - ini.year) * 12 + d.month - ini.month + 1 > 12]
+        rx_html += f'''<h2 style="font-size:14px;margin:16px 0 6px">Rateio extraordinário — {e(r["nome"])}</h2>
+<p class="muted" style="font-size:12px;margin:0 0 8px">{e(r.get("descricao", ""))} Total {brl2(r["total_pg"])} = {brl2(r["total_cob"]/unid)} por unidade, cobrado à parte da cota ordinária (sem fundo de reserva), em {len(r["cob"])} parcelas mensais junto com o boleto do dia {venc}, a partir de {datetime.date.fromisoformat(r["primeiro_vencimento"]).strftime("%d/%m/%Y")}. Despesa extraordinária: responsabilidade do proprietário (Lei 8.245/91, art. 22, X), inclusive das unidades ainda da incorporadora. Recebimento no cenário base ({cen_b['em_dia']*100:.0f}% em dia); o caixa cobre a diferença temporária entre o pagamento ao fornecedor e o recebimento das parcelas{(" — " + str(len(fora)) + " parcela(s) do fornecedor vencem depois do horizonte de 12 meses do gráfico") if fora else ""}.</p>
+<div class="tw"><table><thead><tr><th>Mês</th><th class="n">Por unidade</th><th class="n c-md">Faturado (32 un.)</th><th class="n">Recebido</th><th class="n">Pago ao fornecedor</th><th class="n">Saldo acumulado</th></tr></thead><tbody>{rtr}</tbody></table></div>'''
     mtr = ""; fundo = 0.0
     for k, x in enumerate(CEN["base"]["meses"]):
         fundo += prov_m - (per_m[k - 1] if k >= 1 else 0)
@@ -313,6 +348,7 @@ if os.path.exists(_pp):
 </div>
 <h2 style="font-size:14px;margin:16px 0 6px">Orçamento por item</h2>
 <div class="tw"><table><thead><tr><th>Item</th><th>Origem do valor</th><th class="n c-md">Valor</th><th class="c-md">Quando ocorre</th><th class="n">Na taxa mensal</th><th class="n">Ano</th></tr></thead><tbody>{otr}</tbody></table></div>
+{rx_html}
 <h2 style="font-size:14px;margin:16px 0 6px">Mês a mês — fixos, periódicos e fundo de provisões (cenário base)</h2>
 <p class="muted" style="font-size:12px;margin:0 0 8px">Os fixos saem todo mês; os periódicos saem só quando vencem e são pagos com o fundo de provisões, alimentado por {brl(prov_m)} por mês. Fundo negativo nos primeiros meses indica despesa periódica que vence antes de a provisão estar formada — é o que o fundo inicial de instalação cobre. A coluna Entradas inclui os boletos e, quando houver, as parcelas do fundo de instalação recebidas no mês. Fixos e periódicos por mês de competência (o pagamento cai no dia {dpag} do mês seguinte); caixa livre pelo calendário real, já sem o fundo de reserva.</p>
 <div class="tw"><table><thead><tr><th>Mês</th><th class="n c-md">Entradas</th><th class="n">Fixos (A)</th><th class="n">Periódicos pagos (B)</th><th class="n c-md">Provisão do mês</th><th class="n">Fundo de provisões</th><th class="n">Caixa livre</th></tr></thead><tbody>{mtr}</tbody></table></div>

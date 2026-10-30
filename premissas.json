@@ -1,5 +1,5 @@
 {
-  "_comentario": "Premissas do orçamento, fluxo de caixa e capital de giro exibidos na página do conselho. Edite aqui e faça upload no GitHub; a rotina de publicação recalcula tudo. Valores em R$; percentuais em fração (0.10 = 10%). FORA DO ORÇAMENTO por decisão do síndico (18/09/2026): gás/GLP — fornecimento e cobrança individual por unidade, direto pela distribuidora, sem cotação pelo condomínio; manutenção de elevadores (mensal e RIA/ART) — fica com a fabricante do equipamento para não perder a garantia; manutenção elétrica/hidráulica/predial e laudo do SPDA — sem previsão de levantamento de demanda/orçamento. As linhas 'elevadores', 'elev_ria', 'predial' e 'spda' foram removidas; reincluir aqui se a decisão mudar. 25/09/2026 (manhã da AGE): série mensal de caixa, necessidade de caixa mínimo e folga do fundo de instalação RECALCULADAS com gen_conselho.py sobre este arquivo e o banco do painel (55 fornecedores), incluindo a decisão do Conselho de 24/09 (Atlanta portaria remota R$ 5.500 e zeladoria R$ 21.300) e a 2ª proposta de piscina (Edson, R$ 800). 28/09/2026: propostas revisadas do Grupo Atlanta (escolhido na AGE de 25/09) — portaria remota R$ 5.500 → R$ 5.000/mês e zeladoria (3 postos) R$ 21.300 → R$ 18.300/mês; orçamento, taxa, série de caixa, necessidade de caixa mínimo e folga do fundo recalculados com gen_conselho.py sobre este arquivo e o banco do painel. 06/10/2026: 1ª proposta de jardinagem e paisagismo lançada no painel (Mendes Jardinagem, orçamento OR.0004, R$ 1.500/mês, 2 visitas por mês) — substitui a estimativa de R$ 900/mês da linha 'jardim' (+R$ 600/mês); orçamento, taxa, série de caixa, necessidade de caixa mínimo e folga do fundo recalculados com gen_conselho.py sobre este arquivo e o banco do painel (56 fornecedores). 07/10/2026: piscina CONTRATADA (Tratamento Piscinas Edson, R$ 800/mês — status Contratado no painel; o Anderson reenviou proposta a R$ 700 em 05/10, registrada sem alterar a linha); nova categoria 'Portões da garagem' no painel e no gen_conselho.py com 3 propostas de troca dos 3 portões de enrolar (Tecnoportas R$ 104.960 · Metal Laran R$ 115.605, ou R$ 95.505 à vista · Hi.flo R$ 153.579) — investimento único, FORA da taxa mensal e deste orçamento; sem linha aqui até a assembleia deliberar a obra e a fonte de recursos (rateio extraordinário). 30/10/2026: (1) SEGURO — cotação Tokio Marine nº 1085302176 via VJOMM (29/10/2026, validade 05/11), já no CNPJ do condomínio, lançada no painel: cenário recomendado LMI R$ 160 mi + assistência básica, R$ 27.998,16/ano em 6x sem juros (alternativa LMI R$ 100 mi, R$ 24.088,36); a linha 'seguro' passa a ser anual (freq 12, 1ª em nov/26) paga em 6 parcelas e entra na taxa pelo valor anual ÷ 12 — substitui a Allianz (R$ 44.547,19, vencida em 16/10). (2) LIMPVEL — contrato recebido em 27/10/2026 com os valores aprovados (R$ 450/mês + R$ 1.900 por limpeza semestral), vigência a partir de 10/11/2026: 'agua_poco' e 'reservatorios' começam no mês 2 (nov/26). (3) BOX DE ENTREGAS fora do orçamento ('ativo': false) — o síndico informou em 28/10 que o armário inteligente ainda não existe e é opção futura. (4) FUNDO DE RESERVA calculado SOBRE a cota ordinária (ata 02/09, item 7; cota aprovada R$ 1.504,00 + 10% = R$ 1.654,40) — 'fundo_reserva_modo': 'sobre_cota'; antes o modelo tratava os 10% como fração do total (÷ 0,9), o que superestimava a taxa em ≈ 1%. (5) 'taxa_adotada' = cota aprovada R$ 1.654,40 (o que de fato é cobrado), e 1º boleto ordinário em 10/11/2026 (cenário base) — outubro coberto pelo fundo de instalação; pessimista com 1º boleto em 10/12.",
+  "_comentario": "Premissas do orçamento, fluxo de caixa e capital de giro exibidos na página do conselho. Edite aqui e faça upload no GitHub; a rotina de publicação recalcula tudo. Valores em R$; percentuais em fração (0.10 = 10%). FORA DO ORÇAMENTO por decisão do síndico (18/09/2026): gás/GLP — fornecimento e cobrança individual por unidade, direto pela distribuidora, sem cotação pelo condomínio; manutenção de elevadores (mensal e RIA/ART) — fica com a fabricante do equipamento para não perder a garantia; manutenção elétrica/hidráulica/predial e laudo do SPDA — sem previsão de levantamento de demanda/orçamento. As linhas 'elevadores', 'elev_ria', 'predial' e 'spda' foram removidas; reincluir aqui se a decisão mudar. 25/09/2026 (manhã da AGE): série mensal de caixa, necessidade de caixa mínimo e folga do fundo de instalação RECALCULADAS com gen_conselho.py sobre este arquivo e o banco do painel (55 fornecedores), incluindo a decisão do Conselho de 24/09 (Atlanta portaria remota R$ 5.500 e zeladoria R$ 21.300) e a 2ª proposta de piscina (Edson, R$ 800). 28/09/2026: propostas revisadas do Grupo Atlanta (escolhido na AGE de 25/09) — portaria remota R$ 5.500 → R$ 5.000/mês e zeladoria (3 postos) R$ 21.300 → R$ 18.300/mês; orçamento, taxa, série de caixa, necessidade de caixa mínimo e folga do fundo recalculados com gen_conselho.py sobre este arquivo e o banco do painel. 06/10/2026: 1ª proposta de jardinagem e paisagismo lançada no painel (Mendes Jardinagem, orçamento OR.0004, R$ 1.500/mês, 2 visitas por mês) — substitui a estimativa de R$ 900/mês da linha 'jardim' (+R$ 600/mês); orçamento, taxa, série de caixa, necessidade de caixa mínimo e folga do fundo recalculados com gen_conselho.py sobre este arquivo e o banco do painel (56 fornecedores). 07/10/2026: piscina CONTRATADA (Tratamento Piscinas Edson, R$ 800/mês — status Contratado no painel; o Anderson reenviou proposta a R$ 700 em 05/10, registrada sem alterar a linha); nova categoria 'Portões da garagem' no painel e no gen_conselho.py com 3 propostas de troca dos 3 portões de enrolar (Tecnoportas R$ 104.960 · Metal Laran R$ 115.605, ou R$ 95.505 à vista · Hi.flo R$ 153.579) — investimento único, FORA da taxa mensal e deste orçamento; sem linha aqui até a assembleia deliberar a obra e a fonte de recursos (rateio extraordinário). 30/10/2026: (1) SEGURO — cotação Tokio Marine nº 1085302176 via VJOMM (29/10/2026, validade 05/11), já no CNPJ do condomínio, lançada no painel: cenário recomendado LMI R$ 160 mi + assistência básica, R$ 27.998,16/ano em 6x sem juros (alternativa LMI R$ 100 mi, R$ 24.088,36); a linha 'seguro' passa a ser anual (freq 12, 1ª em nov/26) paga em 6 parcelas e entra na taxa pelo valor anual ÷ 12 — substitui a Allianz (R$ 44.547,19, vencida em 16/10). (2) LIMPVEL — contrato recebido em 27/10/2026 com os valores aprovados (R$ 450/mês + R$ 1.900 por limpeza semestral), vigência a partir de 10/11/2026: 'agua_poco' e 'reservatorios' começam no mês 2 (nov/26). (3) BOX DE ENTREGAS fora do orçamento ('ativo': false) — o síndico informou em 28/10 que o armário inteligente ainda não existe e é opção futura. (4) FUNDO DE RESERVA calculado SOBRE a cota ordinária (ata 02/09, item 7; cota aprovada R$ 1.504,00 + 10% = R$ 1.654,40) — 'fundo_reserva_modo': 'sobre_cota'; antes o modelo tratava os 10% como fração do total (÷ 0,9), o que superestimava a taxa em ≈ 1%. (5) 'taxa_adotada' = cota aprovada R$ 1.654,40 (o que de fato é cobrado), e 1º boleto ordinário em 10/11/2026 (cenário base) — outubro coberto pelo fundo de instalação; pessimista com 1º boleto em 10/12. 30/10/2026 (tarde): troca dos 3 portões da garagem CONTRATADA com a Hi.flo (contrato HF-2026-122, R$ 138.000, entrada 10/11/2026 + 12x) — novo bloco 'rateios_extras' (rateio extraordinário de R$ 4.312,50/unidade em 13 parcelas, fora da cota ordinária e sem fundo de reserva); o gen_conselho.py passou a lançar no fluxo de caixa a cobrança (com o perfil de inadimplência de cada cenário) e os pagamentos ao fornecedor nas datas do contrato. Fechamento de sacadas segue FORA do condomínio: cada proprietário contrata e paga o seu (síndico, 30/10/2026).",
   "unidades": 32,
   "unidades_isentas": 0,
   "taxa_construtora": 1200,
@@ -357,5 +357,83 @@
     "total": 1654.4,
     "fonte": "AGE de 25/09/2026, item 5 — cota ordinária R$ 1.504,00 + fundo de reserva de 10% (R$ 150,40) = R$ 1.654,40/unidade; orçamento anual aprovado R$ 571.512"
   },
-  "_cenarios_obs": "30/10/2026: 1º boleto ordinário em 10/11/2026 no cenário base (defasagem 1) e em 10/12/2026 no pessimista (defasagem 2); em out/2026 só entrou o fundo de instalação (2ª parcela em 20/10). Ajustar se a cota de outubro tiver sido cobrada."
+  "_cenarios_obs": "30/10/2026: 1º boleto ordinário em 10/11/2026 no cenário base (defasagem 1) e em 10/12/2026 no pessimista (defasagem 2); em out/2026 só entrou o fundo de instalação (2ª parcela em 20/10). Ajustar se a cota de outubro tiver sido cobrada.",
+  "rateios_extras": [
+    {
+      "id": "portoes_hiflo",
+      "nome": "troca dos 3 portões da garagem (Hi.flo)",
+      "descricao": "Contrato Hi.flo – Speed Company, proposta HF-2026-122, assinado em 30/10/2026: 3 portões SHF de enrolar de alto fluxo com caixa de ACM, R$ 138.000,00 (entrada + 12x de R$ 10.615,38).",
+      "primeiro_vencimento": "2026-11-10",
+      "cobranca_por_unidade": [
+        331.73,
+        331.73,
+        331.73,
+        331.73,
+        331.73,
+        331.73,
+        331.73,
+        331.73,
+        331.73,
+        331.73,
+        331.73,
+        331.73,
+        331.74
+      ],
+      "pagamentos": [
+        [
+          "2026-11-10",
+          10615.38
+        ],
+        [
+          "2026-12-10",
+          10615.38
+        ],
+        [
+          "2027-01-09",
+          10615.38
+        ],
+        [
+          "2027-02-08",
+          10615.38
+        ],
+        [
+          "2027-03-10",
+          10615.38
+        ],
+        [
+          "2027-04-09",
+          10615.38
+        ],
+        [
+          "2027-05-09",
+          10615.38
+        ],
+        [
+          "2027-06-08",
+          10615.38
+        ],
+        [
+          "2027-07-08",
+          10615.38
+        ],
+        [
+          "2027-08-07",
+          10615.38
+        ],
+        [
+          "2027-09-06",
+          10615.38
+        ],
+        [
+          "2027-10-06",
+          10615.38
+        ],
+        [
+          "2027-11-05",
+          10615.44
+        ]
+      ],
+      "fonte": "Contrato HF-2026-122 (Clicksign b56ee3f3-b215-4016-9e78-c9d7b7e06786), assinado em 30/10/2026: total R$ 138.000,00 (portões R$ 123.087,39 + caixas ACM R$ 14.844,03 + retirada R$ 2.932,50 − desconto R$ 2.863,92); entrada em 10/11/2026 + 12 parcelas a cada 30 dias até 05/11/2027 (R$ 10.615,38; a última R$ 10.615,44). Rateio igual entre as 32 unidades: R$ 4.312,50 por unidade, cobrado em 13 parcelas (12 × R$ 331,73 + 1 × R$ 331,74) junto com o boleto do dia 10, de nov/26 a nov/27. Fora da cota ordinária e sem fundo de reserva. Despesa extraordinária do proprietário; unidades não alienadas pagas pela Dabol."
+    }
+  ]
 }
